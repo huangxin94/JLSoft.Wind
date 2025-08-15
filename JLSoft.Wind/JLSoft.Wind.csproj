@@ -1,0 +1,101 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    
+    	<!-- 启用清单嵌入 -->
+	<GenerateManifest>true</GenerateManifest>
+	<!-- 指定清单路径（如果文件不在默认位置） -->
+	<ManifestFile>app.manifest</ManifestFile>
+
+ 	<EnableWindowsFormsHighDpiAutoResizing>true</EnableWindowsFormsHighDpiAutoResizing>
+
+ 	<ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AngleSharp" Version="1.3.0" />
+    <PackageReference Include="DuckDB.NET.Bindings" Version="1.2.1" />
+    <PackageReference Include="DuckDB.NET.Bindings.Full" Version="1.2.1" />
+    <PackageReference Include="DuckDB.NET.Data" Version="1.2.1" />
+    <PackageReference Include="DuckDB.NET.Data.Full" Version="1.2.1" />
+    <PackageReference Include="HslCommunication" Version="12.3.0" />
+    <PackageReference Include="MaterialSkin.2" Version="2.3.1" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="NLog" Version="5.5.0" />
+    <PackageReference Include="OpenTK" Version="4.8.2" />
+    <PackageReference Include="OpenTK.GLControl" Version="4.0.1" />
+    <PackageReference Include="SqlSugarCore" Version="5.1.4.130" />
+    <PackageReference Include="SunnyUI" Version="3.8.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="app.manifest">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Image\robot.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Database\Queries\" />
+    <Folder Include="Resources\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="AlignerControllerSDK">
+      <HintPath>AlignerControllerSDK.dll</HintPath>
+    </Reference>
+    <Reference Include="HWLPAPI">
+      <HintPath>HWLPAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="KeyenceOCR_IV4">
+      <HintPath>KeyenceOCR_IV4.dll</HintPath>
+    </Reference>
+    <Reference Include="RobotSocketAPI">
+      <HintPath>RobotSocketAPI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EditorConfigFiles Remove="D:\测试程序\JLSoft.Wind\JLSoft.Wind\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="D:\测试程序\JLSoft.Wind\JLSoft.Wind\.editorconfig" />
+  </ItemGroup>
+
+
+
+</Project>
