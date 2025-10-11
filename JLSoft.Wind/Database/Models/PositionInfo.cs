@@ -12,6 +12,10 @@ namespace JLSoft.Wind.Database.Models
         /// 实际上是设备唯一标识符
         /// </summary>
         public string name { get; set; }
+        /// <summary>
+        /// 别名
+        /// </summary>
+        public string biename { get; set; }
         public Positions positions { get; set; }
     }
 }

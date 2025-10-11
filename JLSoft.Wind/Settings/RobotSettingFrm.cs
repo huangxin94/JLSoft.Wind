@@ -14,6 +14,9 @@ namespace JLSoft.Wind.Settings
 {
     public partial class RobotSettingFrm : Form
     {
+
+        private DeviceIndices _currentDevice;
+        private SubStations _currentSubStation;
         public RobotSettingFrm()
         {
             InitializeComponent();
@@ -115,6 +118,69 @@ namespace JLSoft.Wind.Settings
                     cbx_MoveSlot.Text = string.Empty; // 清空显示文本
                     cbx_MoveSlot.Enabled = false;
                 }
+            }
+        }
+
+        private void uiButton3_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 验证输入
+                if (!double.TryParse(txt_AxisX.Text, out double x) ||
+                    !double.TryParse(txt_AxisY.Text, out double y) ||
+                    !double.TryParse(txt_AxisZ.Text, out double z))
+                {
+                    MessageBox.Show("请输入有效的数值", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // 获取配置服务实例
+                var allDevices = ConfigService.GetDeviceStations();
+                // 查找当前设备
+                var device = allDevices.FirstOrDefault(d => d.DeviceCode == _currentDevice.DeviceCode);
+                if (device == null)
+                {
+                    MessageBox.Show("找不到对应的设备配置", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // 更新点位数据
+                if (_currentSubStation != null)
+                {
+                    // 更新子站点位
+                    var subStation = device.SubStations.FirstOrDefault(s => s.Name == _currentSubStation.Name);
+                    if (subStation != null)
+                    {
+                        subStation.Positions.X = x;
+                        subStation.Positions.Y = y;
+                        subStation.Positions.Z = z;
+                    }
+                }
+                else
+                {
+                    // 更新设备主站点位
+                    device.Positions.X = x;
+                    device.Positions.Y = y;
+                    device.Positions.Z = z;
+                }
+
+                // 保存配置到文件
+                ConfigService.Instance.SaveConfiguration();
+
+                // 更新ListView显示
+                if (listView1.SelectedItems.Count > 0)
+                {
+                    var selected = listView1.SelectedItems[0];
+                    selected.SubItems[1].Text = x.ToString();
+                    selected.SubItems[2].Text = y.ToString();
+                    selected.SubItems[3].Text = z.ToString();
+                }
+
+                MessageBox.Show("保存成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"保存失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

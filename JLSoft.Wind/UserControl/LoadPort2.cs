@@ -24,7 +24,28 @@ namespace JLSoft.Wind.UserControl
 
         }
 
+        public void UpdateMapping(string mappingString)
+        {
+            if (mappingString == null || mappingString.Length != 25)
+                return;
 
+            for (int i = 0; i < 25; i++)
+            {
+                char state = mappingString[i];
+                Color color = Color.White; // 默认白色
+
+                switch (state)
+                {
+                    case '0': color = Color.Gainsboro; break;
+                    case '1': color = Color.Lime; break;
+                    case '2': color = Color.Red; break;
+                    case '3': color = Color.Yellow; break;
+                    case '4': color = Color.Blue; break;
+                }
+
+                SetTextBoxColor(i + 1, color); // 更新第i+1个文本框
+            }
+        }
         private void InitializeTextBoxArray()
         {
             _textBoxes = new TextBox[]

@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Windows.Forms;
+using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using System.Diagnostics;
-using Sunny.UI;
-using JLSoft.Wind.CustomControl;
+using System.Windows.Forms;
 using JLSoft.Wind.Adapter;
+using JLSoft.Wind.CustomControl;
+using JLSoft.Wind.Services.Connect;
+using Sunny.UI;
+using static JLSoft.Wind.Services.Status.DeviceMonitor;
 
 namespace JLSoft.Wind.UserControl
 {
@@ -40,6 +43,30 @@ namespace JLSoft.Wind.UserControl
         public event EventHandler<ControlOperationEventArgs> ControlColorChanged;
 
 
+        #region 机器人移动相关字段
+        private System.Windows.Forms.Timer _animationTimer;
+        private Point _robotTargetPosition;
+        private float _robotTargetAngle;
+        private const int AnimationInterval = 20; // 20ms动画帧
+        private const float AnimationSpeed = 0.1f; // 动画速度系数
+        private string _targetDeviceCode;
+
+        // 添加设备方向字典
+        private readonly Dictionary<string, Direction> _deviceDirections = new Dictionary<string, Direction>();
+
+        // 添加机器人状态枚举
+        private enum RobotState { Idle, Moving, Rotating, MovingAfterRotation }
+        private RobotState _robotState = RobotState.Idle;
+
+        // 添加方向枚举（修复访问级别问题）
+        public enum Direction { Top, Right, Bottom, Left }
+
+        private System.Windows.Forms.Timer _rotationTimer = new System.Windows.Forms.Timer() { Interval = 20 };
+        private float _rotationStep = 0f;
+        private const float RotationSpeed = 15f; // 每次旋转的度数
+        private float _targetRotation = 0f;
+        private enum RotationDirection { Clockwise, CounterClockwise }
+        #endregion
 
         #endregion
 
@@ -69,10 +96,503 @@ namespace JLSoft.Wind.UserControl
             this.SizeChanged += FactoryLayoutControl_SizeChanged;
 
             _resizeTimer.Tick += ResizeTimer_Tick;
+
+
+            _animationTimer = new System.Windows.Forms.Timer { Interval = AnimationInterval };
+            _animationTimer.Tick += AnimationTimer_Tick;
+
+            // 初始化设备信息
+            InitializeDeviceInfo(); 
+            InitializeRotationTimer();
+            _rotationTimer.Interval = 20;
+
+
         }
 
+        #region 新增Robot移动与设备定位功能
+
+
+
+        private void InitializeRotationTimer()
+        {
+            _rotationTimer.Tick += (s, e) =>
+            {
+                if (_robotState != RobotState.Rotating) return;
+                // 计算最短旋转路径
+                float delta = _targetRotation - _rotationAngle;
+                float absDelta = Math.Abs(delta);
+
+                // 处理跨360°的旋转
+                if (absDelta > 180)
+                {
+                    delta = delta < 0 ? delta + 360 : delta - 360;
+                    absDelta = Math.Abs(delta);
+                }
+
+                if (absDelta < RotationSpeed)
+                {
+                    _rotationAngle = _targetRotation;
+                    _rotationTimer.Stop();
+                    ApplyRotation(_rotationAngle);
+                    UpdatePositionIndicator(_targetDeviceCode);
+                    _robotState = RobotState.Idle;// 完成后设为空闲
+                    return;
+                }
+
+                // 确定旋转方向
+                //RotationDirection direction = delta > 0 ?
+                //    RotationDirection.Clockwise :
+                //    RotationDirection.CounterClockwise;
+
+                // 应用旋转
+                float rotationStep = Math.Sign(delta) * Math.Min(RotationSpeed, absDelta);
+                RotateImage(rotationStep);
+
+                //RotateImage(rotationStep);
+                //ApplyRotation(_rotationAngle);
+            };
+        }
+
+        // 添加机器人状态枚举
+        private void InitializeDeviceInfo()
+        {
+            // 添加设备信息：位置和默认指向方向
+            _deviceDirections.Add("P1", Direction.Left);
+            _deviceDirections.Add("S4", Direction.Top);
+            _deviceDirections.Add("V1", Direction.Bottom);
+            _deviceDirections.Add("M1", Direction.Top);
+            _deviceDirections.Add("S3", Direction.Top);
+            _deviceDirections.Add("U1", Direction.Bottom);
+            _deviceDirections.Add("C1", Direction.Top);
+            _deviceDirections.Add("G1", Direction.Bottom);
+            _deviceDirections.Add("R1", Direction.Top);
+            _deviceDirections.Add("寻边器", Direction.Bottom);
+            _deviceDirections.Add("角度台", Direction.Bottom);
+            _deviceDirections.Add("A1", Direction.Top);
+            _deviceDirections.Add("A2", Direction.Top);
+            _deviceDirections.Add("A3", Direction.Top);
+            _deviceDirections.Add("A4", Direction.Top);
+            _deviceDirections.Add("LoadPort1", Direction.Bottom);
+            _deviceDirections.Add("LoadPort2", Direction.Bottom);
+        }
+        private Direction _targetDirection; // 目标方向
+        private Label _debugLabel;
+        public void SmoothMoveRobotToDevice(string deviceCode)
+        {
+            if (!_deviceDirections.TryGetValue(deviceCode, out var direction))
+                return;
+
+            _targetDirection = direction; // 存储目标方向
+
+            var deviceControl = FindDeviceControl(deviceCode);
+            if (deviceControl == null) return;
+
+            // 停止所有动画
+            _animationTimer.Stop();
+            _rotationTimer.Stop();
+
+            // 计算目标位置和角度
+            Point screenPoint = deviceControl.PointToScreen(Point.Empty);
+            Point panelPoint = uiPanel2.PointToClient(screenPoint);
+            _robotTargetPosition = new Point(
+                panelPoint.X + deviceControl.Width / 2 - pictureBox1.Width / 2,
+                pictureBox1.Top
+            );
+            _targetRotation = GetRotationAngle(direction);
+            _targetDeviceCode = deviceCode;
+            float rotationNeeded = GetRelativeRotation(direction);
+
+            // 优先处理旋转
+            _robotState = RobotState.Moving;
+            _animationTimer.Start();
+
+            if (_rotationTimer.Enabled)
+            {
+                _rotationTimer.Stop();
+            }
+        }
+
+
+        private float GetRelativeRotation(Direction targetDirection)
+        {
+            // 假设机器人当前方向存储在_currentDirection
+            var current = _currentDirection;
+            var target = targetDirection;
+
+            // 计算最短旋转路径
+            if (current == target) return 0f;
+
+            // 计算顺时针和逆时针的旋转角度
+            int clockwise = (4 + (int)target - (int)current) % 4 * 90;
+            int counterClockwise = clockwise - 360;
+
+            // 返回绝对值最小的旋转角度
+            return Math.Abs(clockwise) < Math.Abs(counterClockwise)
+                ? clockwise : counterClockwise;
+        }
+        // 优化后的动画帧处理
+        private void AnimationTimer_Tick(object sender, EventArgs e)
+        {
+            switch (_robotState)
+            {
+                case RobotState.Moving:
+                    HandleMovement();
+                    break;
+                case RobotState.Rotating:
+                    HandleRotation();
+                    break;
+            }
+        }
+        private float _robotCurrentPositionX;
+        private void HandleMovement()
+        {
+
+            float targetX = _robotTargetPosition.X;
+            float dx = targetX - _robotCurrentPositionX;
+            float absDx = Math.Abs(dx);
+
+            int maxX = uiPanel2.Width - pictureBox1.Width;
+
+            if (targetX < 0) targetX = 0;
+            if (targetX > maxX) targetX = maxX;
+
+            // 重新计算距离
+            dx = targetX - _robotCurrentPositionX;
+            absDx = Math.Abs(dx);
+
+
+            if ((_robotCurrentPositionX <= 0 && dx < 0) ||
+                (_robotCurrentPositionX >= maxX && dx > 0))
+            {
+                // 到达边界，直接开始旋转
+                _robotState = RobotState.Rotating;
+                return;
+            }
+            // 到达判定（5像素容差）
+            if (absDx < 5f)
+            {
+                // 精确到达目标位置
+                _robotCurrentPositionX = targetX;
+                pictureBox1.Left = (int)Math.Round(_robotCurrentPositionX);
+
+
+                // 旋转判断逻辑
+                if (_currentDirection != _targetDirection)
+                {
+                    _robotState = RobotState.Rotating;
+                }
+                else
+                {
+                    _robotState = RobotState.Idle;
+                    UpdatePositionIndicator(_targetDeviceCode);
+                }
+                return;
+            }
+
+            // 动态步长计算
+            float step = Math.Sign(dx) * Math.Max(1f, absDx * AnimationSpeed);
+            
+            // 更新浮点位置
+            _robotCurrentPositionX += step;
+
+            // 边界检查
+            _robotCurrentPositionX = Math.Max(0, Math.Min(maxX, _robotCurrentPositionX));
+
+            // 更新UI位置（四舍五入）
+            int newPosition = (int)Math.Round(_robotCurrentPositionX);
+            pictureBox1.Left = newPosition;
+        }
+        private void HandleRotation()
+        {
+            // 计算当前剩余角度（动态计算，非固定值）
+
+            float remaining = CalculateRemainingRotation();
+            //float progress = Math.Abs(remaining) / 180f; // 旋转进度(0-1)
+            //float curvedSpeed = RotationSpeed * (1 + 2 * (float)Math.Sin(progress * Math.PI)); // 正弦曲线加速
+
+
+            float absRemaining = Math.Abs(remaining);
+
+
+            float dynamicSpeed = Math.Min(90f, Math.Max(RotationSpeed, absRemaining * 0.5f));
+            // 完成条件：小于旋转步长
+            if (absRemaining <= dynamicSpeed)
+            {
+                // 应用最终旋转调整
+                RotateImage(remaining);
+                _rotationAngle = NormalizeAngle(_rotationAngle + remaining);
+                _currentDirection = _targetDirection; // 更新方向
+
+                _robotState = RobotState.Idle;
+                UpdatePositionIndicator(_targetDeviceCode);
+                return;
+            }
+            float t = Math.Abs(remaining) / 180f;
+            float easeFactor = 1 - (1 - t) * (1 - t);
+            float step = Math.Sign(remaining) * dynamicSpeed * easeFactor;
+            // 计算旋转步长（带方向）
+            //float step = Math.Sign(remaining) * dynamicSpeed;
+
+            // 应用旋转
+            RotateImage(step);
+            _rotationAngle = NormalizeAngle(_rotationAngle + step);
+
+            // 更新当前方向
+            _currentDirection = GetCurrentDirection();
+        }
+        private float CalculateRemainingRotation()
+        {
+            // 计算最短路径
+            float delta = _targetRotation - _rotationAngle;
+
+            // 处理跨越360°的情况
+            if (delta > 180) delta -= 360;
+            if (delta < -180) delta += 360;
+
+            return delta;
+        }
+        private Direction GetCurrentDirection()
+        {
+            // 将角度标准化到0-360
+            float normalized = NormalizeAngle(_rotationAngle);
+
+            if (normalized >= 315 || normalized < 45) return Direction.Top;
+            if (normalized >= 45 && normalized < 135) return Direction.Right;
+            if (normalized >= 135 && normalized < 225) return Direction.Bottom;
+            return Direction.Left;
+        }
+
+        #endregion
+        private Control FindDeviceControl(string deviceCode)
+        {
+            return FindControlRecursive(this, deviceCode);
+        }
+        private Control FindControlRecursive(Control parent, string deviceCode)
+        {
+            foreach (Control c in parent.Controls)
+            {
+                if (c is DeviceBlock db && db.DeviceCode == deviceCode)
+                    return c;
+                if (c is DeviceBlock2 db2 && db2.DeviceCode == deviceCode)
+                    return c;
+                if (c is PseudoCubeControl pc && pc.LabelText == deviceCode)
+                    return c;
+
+                // 递归搜索子容器
+                var found = FindControlRecursive(c, deviceCode);
+                if (found != null) return found;
+            }
+            return null;
+        }
+        // 获取旋转角度
+        private float GetRotationAngle(Direction direction)
+        {
+            return direction switch
+            {
+                Direction.Top => 0f,
+                Direction.Right => 90f,
+                Direction.Bottom => 180f, // ✅ 处理下方
+                Direction.Left => 270f,
+                _ => 0f
+            };
+        }
+
+        private Bitmap _originalRobotImage;
+        #region 旋转与拖动
+        // 优化旋转方法
+        public void RotateImage(float degrees)
+        {
+            if (pictureBox1.Image == null) return;
+
+            try
+            {
+                // 只创建一次原始图像的副本
+                if (_originalRobotImage == null)
+                {
+                    _originalRobotImage = new Bitmap(pictureBox1.Image);
+                }
+
+                // 更新当前角度
+                _rotationAngle = NormalizeAngle(_rotationAngle + degrees);
+
+                // 创建旋转后的图像
+                using (var rotated = RotateImageInternal(_originalRobotImage, _rotationAngle))
+                {
+                    if (pictureBox1.InvokeRequired)
+                    {
+                        pictureBox1.Invoke(() => {
+                            pictureBox1.Image?.Dispose();
+                            pictureBox1.Image = new Bitmap(rotated); // 创建新副本
+                            pictureBox1.Invalidate(); // 强制重绘
+                        });
+                    }
+                    else
+                    {
+                        pictureBox1.Image?.Dispose();
+                        pictureBox1.Image = new Bitmap(rotated); // 创建新副本
+                        pictureBox1.Invalidate(); // 强制重绘
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"旋转错误: {ex.Message}");
+            }
+        }
+        private float NormalizeAngle(float angle)
+        {
+            while (angle >= 360) angle -= 360;
+            while (angle < 0) angle += 360;
+            return angle;
+        }
+        private void ApplyRotation(float angle)
+        {
+            if (pictureBox1.Image == null) return;
+
+            // 创建旋转后的图像
+            using (var rotated = RotateImageInternal(_originalRobotImage, angle))
+            {
+                if (pictureBox1.InvokeRequired)
+                {
+                    pictureBox1.Invoke(() => {
+                        pictureBox1.Image?.Dispose();
+                        pictureBox1.Image = new Bitmap(rotated);
+                        pictureBox1.Invalidate(); // 强制重绘
+                    });
+                }
+                else
+                {
+                    pictureBox1.Image?.Dispose();
+                    pictureBox1.Image = new Bitmap(rotated);
+                    pictureBox1.Invalidate(); // 强制重绘
+                }
+            }
+        }
+        // 优化旋转计算
+        private Bitmap RotateImageInternal(Image original, float angle)
+        {
+            // 创建新位图
+            var bmp = new Bitmap(original.Width, original.Height);
+
+            using (var g = Graphics.FromImage(bmp))
+            {
+                g.Clear(Color.Transparent);
+                g.SmoothingMode = SmoothingMode.HighQuality;
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+
+                // 计算旋转中心
+                float centerX = original.Width / 2f;
+                float centerY = original.Height / 2f;
+
+                // 应用变换
+                g.TranslateTransform(centerX, centerY);
+                g.RotateTransform(angle);
+                g.TranslateTransform(-centerX, -centerY);
+
+                // 绘制图像
+                g.DrawImage(original, 0, 0);
+            }
+
+            return bmp;
+        }
+        #endregion
+
+        #region 位置指示器更新
+        private void UpdatePositionIndicator(string deviceCode)
+        {
+            ClearPositionIndicators();
+
+            if (!this.Controls.ContainsKey(deviceCode))
+                return;
+
+            var device = this.Controls[deviceCode];
+            var direction = _deviceDirections.ContainsKey(deviceCode)
+                ? _deviceDirections[deviceCode]
+                : Direction.Right;
+
+            // 根据设备方向设置位置
+            var indicator = new Label
+            {
+                Text = GetDirectionSymbol(direction),
+                ForeColor = Color.Red,
+                Font = new Font("Arial", 12, FontStyle.Bold),
+                AutoSize = true,
+                Name = "PositionIndicator"
+            };
+
+            Point location = CalculateIndicatorPosition(device, direction);
+            indicator.Location = location;
+
+            this.Controls.Add(indicator);
+            indicator.BringToFront();
+        }
+        private void ClearPositionIndicators()
+        {
+            var indicators = this.Controls
+                .OfType<Control>()
+                .Where(c => c.Name == "PositionIndicator")
+                .ToList();
+
+            foreach (var indicator in indicators)
+            {
+                this.Controls.Remove(indicator);
+                indicator.Dispose();
+            }
+        }
+
+        private string GetDirectionSymbol(Direction direction)
+        {
+            return direction switch
+            {
+                Direction.Top => "▲",
+                Direction.Right => "▶",
+                Direction.Bottom => "▼",
+                Direction.Left => "◀",
+                _ => "●"
+            };
+        }
+
+        private Point CalculateIndicatorPosition(Control device, Direction direction)
+        {
+            int padding = 5;
+
+            return direction switch
+            {
+                Direction.Top => new Point(
+                    device.Location.X + device.Width / 2 - 8,
+                    device.Location.Y - padding - 20),
+
+                Direction.Right => new Point(
+                    device.Location.X + device.Width + padding,
+                    device.Location.Y + device.Height / 2 - 10),
+
+                Direction.Bottom => new Point(
+                    device.Location.X + device.Width / 2 - 8,
+                    device.Location.Y + device.Height + padding),
+
+                Direction.Left => new Point(
+                    device.Location.X - padding - 20,
+                    device.Location.Y + device.Height / 2 - 10),
+
+                _ => new Point(
+                    device.Location.X + device.Width / 2 - 8,
+                    device.Location.Y - padding - 20)
+            };
+        }
+        #endregion
+
+        Direction _currentDirection = Direction.Top; // 机器人当前方向，默认向上
         private void FactoryLayoutControl_Load(object sender, EventArgs e)
         {
+            if (pictureBox1.Image != null && _originalRobotImage == null)
+            {
+                _originalRobotImage = new Bitmap(pictureBox1.Image);
+                // 初始方向向上
+                _currentDirection = Direction.Top;
+            }
+
+            _robotCurrentPositionX = pictureBox1.Left;
+            _currentDirection = Direction.Top;
             InitializeOriginalBounds();
         }
 
@@ -88,9 +608,6 @@ namespace JLSoft.Wind.UserControl
             {
                 if (block != null) block.Click += DeviceBlock_Click;
             }
-            deviceBlock21.Click += DeviceBlock_Click;
-            deviceBlock22.Click += DeviceBlock_Click;
-            pseudoCubeControl1.Click += PseudoCube_Click;
         }
         #endregion
 
@@ -347,51 +864,6 @@ namespace JLSoft.Wind.UserControl
         #endregion
 
         #region 旋转与拖动
-        public void RotateImage(float degrees)
-        {
-            const float angleThreshold = 2f;
-            if (Math.Abs(degrees) < angleThreshold) return;
-            if ((DateTime.Now - _lastRenderTime).TotalMilliseconds < RenderInterval) return;
-
-            _rotationAngle += degrees;
-            _rotationAngle %= 360;
-
-            if (pictureBox1.Image == null) return;
-
-            Task.Run(() =>
-            {
-                using var original = new Bitmap(pictureBox1.Image);
-                Bitmap rotated = RotateImageInternal(original, _rotationAngle);
-                return rotated;
-            }).ContinueWith(t =>
-            {
-                if (t.IsCompletedSuccessfully && !IsDisposed)
-                {
-                    BeginInvoke((MethodInvoker)delegate
-                    {
-                        if (_cachedRotatedImage != null)
-                        {
-                            _cachedRotatedImage.Dispose();
-                        }
-                        _cachedRotatedImage = t.Result;
-                        pictureBox1.Image = _cachedRotatedImage;
-                        _lastRenderTime = DateTime.Now;
-                    });
-                }
-            });
-        }
-
-        private Bitmap RotateImageInternal(Image original, float angle)
-        {
-            var bmp = new Bitmap(original.Width, original.Height);
-            using var g = Graphics.FromImage(bmp);
-            g.SmoothingMode = SmoothingMode.HighQuality;
-            g.TranslateTransform(original.Width / 2f, original.Height / 2f);
-            g.RotateTransform(angle);
-            g.TranslateTransform(-original.Width / 2f, -original.Height / 2f);
-            g.DrawImage(original, 0, 0);
-            return bmp;
-        }
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {

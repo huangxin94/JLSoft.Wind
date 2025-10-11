@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using JLSoft.Wind.Database;
+using JLSoft.Wind.Database.Models;
 using JLSoft.Wind.IServices;
 using JLSoft.Wind.Logs;
 using RobotSocketAPI;
+using static JLSoft.Wind.Database.StationName;
 
 namespace JLSoft.Wind.Services.Connect
 {
@@ -13,7 +16,7 @@ namespace JLSoft.Wind.Services.Connect
     {
         private static readonly Lazy<RobotManager> _instance =
             new Lazy<RobotManager>(() => new RobotManager());
-
+        public static RobotSocketClient _robot = new RobotSocketClient(ConfigService.GetRobotIp(), ConfigService.GetRobotPort());
         public static RobotManager Instance => _instance.Value;
 
         public bool IsConnected => _robotClient?.IsConnected == true;
@@ -35,7 +38,7 @@ namespace JLSoft.Wind.Services.Connect
             try
             {
                 _robotClient = new RobotSocketClient(_ipAddress, _port);
-                await _robotClient.ConnectWithRetryAsync(3, 1000);
+                await _robotClient.ConnectAsync();
                 _initialized = true;
 
                 if (IsConnected)
@@ -65,7 +68,6 @@ namespace JLSoft.Wind.Services.Connect
                     _robotClient = new RobotSocketClient(_ipAddress, _port);
                 }
 
-                await _robotClient.ConnectWithRetryAsync(3, 1000);
 
                 if (IsConnected)
                 {
@@ -108,6 +110,27 @@ namespace JLSoft.Wind.Services.Connect
         ~RobotManager()
         {
             Dispose(false);
+        }
+
+
+        public async Task Robot_GetAsync(Station station, string slot, CancellationToken cts)
+        {
+            string sta = StationName.GetAlias(station).ToUpper();
+            await _robot.GETAsync(sta, slot, cts);
+        }
+
+        public async Task Robot_PutAsync(Station station, string slot, CancellationToken cts)
+        {
+            string sta = StationName.GetAlias(station).ToUpper();
+            await _robot.PUTAsync(sta, slot, cts);
+        }
+        public async Task AxisMovStation(string station, Positions posit)
+        {
+
+            var stateX = Leisai_Axis.Leisai_Pmov(0, posit.X, 1);
+            var stateZ = Leisai_Axis.Leisai_Pmov(2, posit.Z, 1);
+            var stateY = Leisai_Axis.Leisai_Pmov(1, posit.Y, 1);
+            await Task.WhenAll(stateY, stateZ);
         }
     }
 

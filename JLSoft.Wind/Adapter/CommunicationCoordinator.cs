@@ -8,6 +8,7 @@ using System.Timers;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 using Sunny.UI;
 using JLSoft.Wind.Services.Connect;
+using JLSoft.Wind.Services;
 
 namespace JLSoft.Wind.Adapter
 {
@@ -43,6 +44,11 @@ namespace JLSoft.Wind.Adapter
         }
         public CommunicationCoordinator(IEnumerable<NetworkNode> nodes)
         {
+            if (!ConfigService.IsPlcConnectionEnabled())
+            {
+                LogManager.Log("PLC连接已禁用，跳过通信协调器初始化", LogLevel.Info);
+                return;
+            }
             // 初始化PLC连接
             _connections = nodes.ToDictionary(
                 n => n.StationId,
@@ -55,7 +61,7 @@ namespace JLSoft.Wind.Adapter
                 _deviceStates[node.StationId] = new DeviceStatusModel
                 {
                     StationId = node.StationId,
-                    Status = DeviceStatus.Unknown,
+                    Status = DeviceStatusPLC.Unknown,
                     LastHeartbeat = DateTime.Now
                 };
             }
@@ -104,7 +110,7 @@ namespace JLSoft.Wind.Adapter
 
                     if (result.IsSuccess)
                     {
-                        state.Status = DeviceStatus.Online;
+                        state.Status = DeviceStatusPLC.Online;
                         state.LastHeartbeat = DateTime.Now;
                         state.Statistics.CommFailures = 0; // 重置设备统计中的失败计数
                         connection.CommunicationFailures = 0; // 重置连接失败计数
@@ -139,7 +145,7 @@ namespace JLSoft.Wind.Adapter
                 return;
 
             // 更新设备状态为警告
-            state.Status = DeviceStatus.Warning;
+            state.Status = DeviceStatusPLC.Warning;
 
             // 记录日志
             LogManager.Log($"PLC ⚠️ 设备警告: 站号={stationId}, 原因: {message}",LogLevel.Warn, "PLC.Main");
@@ -166,7 +172,7 @@ namespace JLSoft.Wind.Adapter
                 return;
 
             // 更新设备状态为错误
-            state.Status = DeviceStatus.Error;
+            state.Status = DeviceStatusPLC.Error;
 
             // 记录日志
             LogManager.Log($"PLC ❌ 设备错误: 站号={stationId}, 原因: {message}", LogLevel.Error, "PLC.Main");
@@ -194,7 +200,7 @@ namespace JLSoft.Wind.Adapter
                 return;
 
             // 更新状态
-            state.Status = DeviceStatus.Offline;
+            state.Status = DeviceStatusPLC.Offline;
 
             // 日志记录
             LogManager.Log($"PLC ⚠️ 设备离线: 站号={stationId}, 名称={_connections[stationId].Node.Name}", LogLevel.Error, "PLC.Main");
@@ -237,7 +243,7 @@ namespace JLSoft.Wind.Adapter
                 if (success)
                 {
                     // 4. 更新状态
-                    _deviceStates[stationId].Status = DeviceStatus.Online;
+                    _deviceStates[stationId].Status = DeviceStatusPLC.Online;
                     _deviceStates[stationId].CommunicationFailures = 0;
                     LogManager.Log($"PLC ✅ 设备已重新连接: 站号={stationId}", LogLevel.Info, "PLC.Main");
 

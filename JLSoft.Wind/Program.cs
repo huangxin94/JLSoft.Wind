@@ -1,7 +1,11 @@
 using System.Data.Common;
 using System.Runtime.InteropServices;
 using DuckDB.NET.Data;
+using JLSoft.Wind.Database.ToMes;
+using JLSoft.Wind.IServices;
 using JLSoft.Wind.Logs;
+using JLSoft.Wind.Services;
+using JLSoft.Wind.Services.Connect;
 using JLSoft.Wind.Services.DuckDb;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -16,6 +20,8 @@ namespace JLSoft.Wind
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         public static string DuckDBConnectionString { get; private set; }
+
+        public static IRemoteDatabaseService RemoteDatabaseService { get; private set; }
 
         [DllImport("user32.dll")]
         private static extern bool SetProcessDPIAware();
@@ -35,7 +41,21 @@ namespace JLSoft.Wind
                 logger.Info("NLog初始化完成");
 
                 DuckDBConnectionString = GetDuckDBConnectionString();
+                var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
 
+                try
+                {
+                    RemoteDatabaseService = new RemoteDatabaseService(configuration);
+                    RemoteDatabaseHelper.Initialize(RemoteDatabaseService);
+
+                    logger.Info("远程数据库服务初始化成功", "Program");
+                }
+                catch (Exception ex)
+                {
+                    logger.Error($"远程数据库服务初始化失败: {ex.Message}", "Program");
+                }
                 // 初始化数据库
                 InitializeDatabase();
 
@@ -52,8 +72,6 @@ namespace JLSoft.Wind
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-
         private static void InitializeDatabase()
         {
             try

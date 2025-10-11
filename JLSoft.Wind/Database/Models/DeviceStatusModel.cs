@@ -21,7 +21,7 @@ namespace JLSoft.Wind.Database.Models
         /// <summary>
         /// 设备当前状态
         /// </summary>
-        public DeviceStatus Status { get; set; }
+        public DeviceStatusPLC Status { get; set; }
         /// <summary>
         /// 设备最后一次心跳时间
         /// </summary>

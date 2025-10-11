@@ -1,23 +1,34 @@
 using System.Data;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using AngleSharp.Dom;
+using DMCE3000;
 using DuckDB.NET.Data;
 using JLSoft.Wind.Adapter;
 using JLSoft.Wind.Class;
 using JLSoft.Wind.CustomControl;
+using JLSoft.Wind.Database;
 using JLSoft.Wind.Database.Models;
 using JLSoft.Wind.Database.Struct;
+using JLSoft.Wind.Enum;
+using JLSoft.Wind.IServices;
 using JLSoft.Wind.Logs;
 using JLSoft.Wind.Services;
 using JLSoft.Wind.Services.Connect;
 using JLSoft.Wind.Services.DuckDb;
 using JLSoft.Wind.Services.Status;
 using JLSoft.Wind.Settings;
+using JLSoft.Wind.UIHelpers;
 using JLSoft.Wind.UserControl;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.VisualBasic;
 using OpenTK.Audio.OpenAL;
 using Sunny.UI;
 using Sunny.UI.Win32;
+using static JLSoft.Wind.Database.StationName;
+using static JLSoft.Wind.Services.Leisai_Axis;
+using DeviceStatus = JLSoft.Wind.UserControl.DeviceStatus;
 using Timer = System.Windows.Forms.Timer;
 
 namespace JLSoft.Wind
@@ -25,24 +36,67 @@ namespace JLSoft.Wind
     public partial class MainForm : Form
     {
         // 保留设计器生成的控件
-        private List<IndustrialModule> modules = new List<IndustrialModule>();// 工业模块列表
         private float rotationAngle = 0; // 记录当前旋转角度
 
+        public static string AxisConfigFilePath = Application.StartupPath + "\\Axis_Config.ini";// 运动控制卡配置文件路径
+        public static MainForm _instance;
+
+
+
         private readonly DuckDbService _dbService;// 数据库服务实例
-        private UIRichTextBox logBox;// 日志框
 
         // 在 MainForm 类中添加以下成员变量
         private bool _isUserLoggedIn = false;/// 是否已登录 
-        private TimechartService _timechartService;//
         CommunicationCoordinator _coordinator; //通信协调器多个PLC连接
         private DeviceMonitor _deviceMonitor; // 设备监控管理器
         private PlcConnection _plcConn;
-        public static List<PositionInfo> AllPositions { get; private set; }
 
+        private static string _currentWaferSize = "8英寸"; // 默认8英寸
+        private static string _currentWaferType = "Wafer";
+
+
+        public Timer _inputRefreshTimer;
+
+        public Timer _outputRefreshTimer;
+        public Timer _positionRefreshTimer;
+
+        public static string _currentStationPos;
+
+
+        public static string CurrentWaferSize
+        {
+            get => _currentWaferSize;
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                    _currentWaferSize = value;
+            }
+        }
+
+        public static string CurrentWaferType
+        {
+            get => _currentWaferType;
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                    _currentWaferType = value;
+            }
+        }
+        public static List<PositionInfo> AllPositions { get; private set; }
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            EventAggregator.LoadPortColorUpdateRequested -= UpdateLoadPortColor;
+            base.OnFormClosed(e);
+        }
         public MainForm()
         {
             this.AutoScaleMode = AutoScaleMode.Dpi;
             InitializeComponent();
+            _instance = this;
+            EventAggregator.LoadPortColorUpdateRequested += UpdateLoadPortColor;
+
+            // 4. 日志系统初始化
+            LogManager.Initialize(uiRichTextBox1);
             try
             {
                 // 初始化代码
@@ -75,12 +129,39 @@ namespace JLSoft.Wind
 
             当前登录用户ToolStripMenuItem.Text = "当前登录用户：未登录"; // 设置菜单项文本
 
-        }
+            // 2. 初始化设备下拉框
+            var deviceIndices = ConfigService.GetDeviceStations();
+            CbxFacility.DataSource = deviceIndices;
+            CbxFacility.DisplayMember = "DeviceCode";
+            CbxFacility.ValueMember = "Index";
 
+
+
+
+        }
+        public void UpdateLoadPortColor(string loadPortName, string mappingString)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action<string, string>(UpdateLoadPortColor), loadPortName, mappingString);
+                return;
+            }
+
+            switch (loadPortName)
+            {
+                case "LoadPort1":
+                    loadPort21.UpdateMapping(mappingString); // 假设 LoadPort2 控件有 SetColor 方法
+                    break;
+                case "LoadPort2":
+                    loadPort22.UpdateMapping(mappingString);
+                    break;
+            }
+        }
         private void TabControl1_Selecting(object sender, TabControlCancelEventArgs e)
         {
             if (e.TabPage == tabPage2)
             {
+                /*
                 if (!_isUserLoggedIn)
                 {
                     // 用户未登录，显示登录
@@ -114,6 +195,7 @@ namespace JLSoft.Wind
                         e.Cancel = true;
                     }
                 }
+                */
 
                 Application.DoEvents();
                 factoryLayoutControl1.ForceRescale();
@@ -250,12 +332,6 @@ namespace JLSoft.Wind
         {
 
         }
-
-        private void uiDataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
         private void 设备定位ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // 实例化已有的子页面窗体
@@ -341,8 +417,6 @@ namespace JLSoft.Wind
                 MessageBox.Show("LD已完成", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
-            // 方式2：以非模态形式显示（用户可同时操作主窗体和子窗体）
-            // sonForm.Show(this);
         }
 
         private void p1ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -363,10 +437,8 @@ namespace JLSoft.Wind
             {
                 // 处理"确定"操作（如果子窗体有确认按钮）
                 MessageBox.Show("P1已完成", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                CustomMessageBox.Show("P1已完成", "成功", MessageType.Warning);
             }
-
-            // 方式2：以非模态形式显示（用户可同时操作主窗体和子窗体）
-            // sonForm.Show(this);
         }
 
         private void x1ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -389,8 +461,6 @@ namespace JLSoft.Wind
                 MessageBox.Show("X1已完成", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
-            // 方式2：以非模态形式显示（用户可同时操作主窗体和子窗体）
-            // sonForm.Show(this);
         }
 
         private void 寻边器ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -412,9 +482,6 @@ namespace JLSoft.Wind
                 // 处理"确定"操作（如果子窗体有确认按钮）
                 MessageBox.Show("寻边器已完成", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
-            // 方式2：以非模态形式显示（用户可同时操作主窗体和子窗体）
-            // sonForm.Show(this);
         }
 
         private void 报警LogToolStripMenuItem_Click(object sender, EventArgs e)
@@ -436,9 +503,6 @@ namespace JLSoft.Wind
                 // 处理"确定"操作（如果子窗体有确认按钮）
                 MessageBox.Show("报警Log已完成", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
-            // 方式2：以非模态形式显示（用户可同时操作主窗体和子窗体）
-            // sonForm.Show(this);
         }
 
         private void 日产能ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -460,9 +524,6 @@ namespace JLSoft.Wind
                 // 处理"确定"操作（如果子窗体有确认按钮）
                 MessageBox.Show("日产能已完成", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
-            // 方式2：以非模态形式显示（用户可同时操作主窗体和子窗体）
-            // sonForm.Show(this);
         }
 
         private void button5_Click(object sender, EventArgs e)
@@ -560,33 +621,12 @@ namespace JLSoft.Wind
         /// <param name="e"></param>
         private async void but_uppower_Click(object sender, EventArgs e)
         {
-            but_uppower.Enabled = false;
-            but_uppower.Text = "连接中...";
-            try
+            bool initSuccess = await _initializer.InitializeAsync();
+            if (!initSuccess)
             {
-                plc = MitsubishiPLC.Instance;
-                var result = await plc.ConnectAsync();
-
-                if (result.IsSuccess)
-                {
-                    but_uppower.Text = "已连接";
-                    but_uppower.FillColor = Color.Green;
-                    LogManager.Log("PLC连接成功",LogLevel.Info, "PLC.Main");
-                }
-                else
-                {
-                    but_uppower.Text = "上电";
-                    LogManager.Log($"PLC连接失败: {result.Message}",LogLevel.Info, "PLC.Main");
-                }
-            }
-            catch (Exception ex)
-            {
-                but_uppower.Text = "上电";
-                LogManager.Log($"连接异常: {ex.Message}");
-            }
-            finally
-            {
-                but_uppower.Enabled = true;
+                uiLight1.State = UILightState.Off;
+                uiLight2.State = UILightState.Off;
+                LogManager.Log("连接初始化失败", LogLevel.Error);
             }
             //MessageBox.Show(uiRichTextBox1.Text.ToString(), "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -600,7 +640,7 @@ namespace JLSoft.Wind
         /// <param name="e"></param>
         private async void but_readin_Click(object sender, EventArgs e)
         {
-
+            /*
             _cts = new CancellationTokenSource();
             int deviceIndex = (int)CbxFacility.SelectedValue; // U1为0，U2为1，依次类推
             string deviceCode = (string)CbxFacility.SelectedValue; // 例如从界面选择
@@ -610,16 +650,16 @@ namespace JLSoft.Wind
                 MessageBox.Show($"PLC 配置中未找到设备编号: {deviceCode}");
                 return;
             }
-            var plcConn = _coordinator.GetPlcConnection(1); // 1为主PLC站号
+            var plcConn = _coordinator?.GetPlcConnection(1); // 1为主PLC站号
 
             if (plcConn == null)
             {
-                MessageBox.Show("PLC连接未初始化！");
+                MessageBox.Show("PLC连接未初始化！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
             if (!plcConn.IsConnected)
                 await plcConn.ConnectAsync();
-            _executor = new SequenceTaskExecutor(plcConn, deviceIndex, "", new Positions(), _deviceMonitor);
+            _executor = new SequenceTaskExecutor(plcConn, deviceIndex, "", new Positions(), _deviceMonitor, _dbService);
 
             try
             {
@@ -634,38 +674,9 @@ namespace JLSoft.Wind
             {
                 LogManager.Log($"时序任务{deviceIndex}异常: {ex.Message}", LogLevel.Error);
             }
-            /*
-            try
-            {
-                but_readin.Enabled = false;
-                plc = _coordinator.GetPlcConnection(1).Plc;
-                if (plc == null) plc = MitsubishiPLC.Instance;
-
-                if (!plc.IsConnected)
-                {
-                    LogManager.Log("PLC未连接，正在尝试连接...");
-                    await plc.ConnectAsync();
-                }
-
-                var writeResult = await plc.WriteDataAsync("B100", 0);
-                if (!writeResult.IsSuccess)
-                    LogManager.Log($"写入失败: {writeResult.Message}");
-
-                short[] values = { 0, 0, 0 };
-                var batchResult = await plc.WriteDataAsync("B200", values);
-
-                LogManager.Log(batchResult.IsSuccess ?
-                    "批量写入成功" : $"批量写入失败: {batchResult.Message}");
-            }
-            catch (Exception ex)
-            {
-                LogManager.Log($"写入操作异常: {ex.Message}");
-            }
-            finally
-            {
-                but_readin.Enabled = true;
-            }
             */
+
+            await WaferSelect();
         }
         /// <summary>
         /// 读取
@@ -674,55 +685,213 @@ namespace JLSoft.Wind
         /// <param name="e"></param>
         private async void but_readout_Click(object sender, EventArgs e)
         {
-            _cts?.Cancel();
+            //_cts?.Cancel();
         }
-
+        private readonly SystemInitializer _initializer = new SystemInitializer();
         private async void MainForm_Load(object sender, EventArgs e)
         {
-            // 1. 构造节点列表
-            var nodes = new List<NetworkNode>
+            // 订阅初始化完成事件
+            _initializer.InitializationCompleted += OnSystemInitialized;
+
+            await AsyncOperations.RunWithLoading(
+                        this,
+                        async (ct) =>
+                        {
+                            // 开始初始化
+                            bool initSuccess = await _initializer.InitializeAsync();
+                            if (!initSuccess)
+                            {
+                                uiLight1.State = UILightState.Off;
+                                uiLight2.State = UILightState.Off;
+                                LogManager.Log("连接初始化失败", LogLevel.Error);
+                            }
+                            if (LeisaiIO.leisaiIO_Init())
+                            {
+                                LedControl.LedFirst();
+                                StartIOInRefresh(50);
+                                StartIOOutRefresh(100);
+                                StartAxisPosition(10);
+                            }
+                            return true; // 需要返回任意值
+                        },
+                        "系统初始化中\n请稍候..."
+                    );
+        }
+
+        private void StartIOInRefresh(int v)
+        {
+            // 确保定时器存在
+            if (_inputRefreshTimer == null)
             {
-                new NetworkNode
-                {
-                    StationId = 1,
-                    IpAddress = ConfigService.GetPlcIp(),
-                    Port = ConfigService.GetPlcPort(),
-                    Name = "主PLC"
-                }
-            };
-            AllPositions = ConfigService.GetDevicePositions(null);
-            // 2. 创建协调器（自动管理连接）
-            _coordinator = new CommunicationCoordinator(nodes);
+                _inputRefreshTimer = new Timer();
+                _inputRefreshTimer.Tick += InputRefreshTimer_Tick;
+            }
 
-            // 3. 传递给TimechartService
-            _timechartService = new TimechartService(_coordinator);
+            // 配置定时器参数
+            _inputRefreshTimer.Interval = v;
 
-            _plcConn = _coordinator.GetPlcConnection(1);
-            _deviceMonitor = new DeviceMonitor(_plcConn);
-            _deviceMonitor.DeviceStatesUpdated += OnDeviceStatesUpdated;
+            // 启动定时器
+            _inputRefreshTimer.Start();
+        }
+        private void InputRefreshTimer_Tick(object sender, EventArgs e)
+        {
+            LeisaiIO.ReadInputState();
+        }
 
-            // 4. 启动设备监控
-            await RobotManager.Instance.InitializeAsync();
-            if (RobotManager.Instance.IsConnected)
-                LogManager.Log("机器人已连接", LogLevel.Info, "Robot.Main");
+        private void StartIOOutRefresh(int v)
+        {
+            // 确保定时器存在
+            if (_outputRefreshTimer == null)
+            {
+                _outputRefreshTimer = new Timer();
+                _outputRefreshTimer.Tick += OutputRefreshTimer_Tick;
+            }
+
+            // 配置定时器参数
+            _outputRefreshTimer.Interval = v;
+
+            // 启动定时器
+            _outputRefreshTimer.Start();
+        }
+
+        private void OutputRefreshTimer_Tick(object sender, EventArgs e)
+        {
+            LeisaiIO.ReadOutputState();
+        }
+
+        /// <summary>
+        /// 读取轴位置timer
+        /// </summary>
+        /// <param name="v"></param>
+        private void StartAxisPosition(int v)
+        {
+            if (_positionRefreshTimer == null)
+            {
+                _positionRefreshTimer = new Timer();
+                _positionRefreshTimer.Tick += PositionRefreshTimer_Tick;
+            }
+
+            // 配置定时器参数
+            _positionRefreshTimer.Interval = v;
+
+            // 启动定时器
+            _positionRefreshTimer.Start();
+        }
+
+        /// <summary>
+        /// 读取位置并显示UI
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PositionRefreshTimer_Tick(object sender, EventArgs e)
+        {
+            ushort axisXState = '0';
+            ushort axisYState = '0';
+            ushort axisZState = '0';
+            Leisai_Axis.EtherCat_Status = Leisai_Axis.Leisai_Geterrcode();
+            Leisai_Axis.X_Axis_Status = Leisai_Axis.Leisai_GetAxisStatus((ushort)AxisName.X, ref axisXState);
+            Leisai_Axis.Y_Axis_Status = Leisai_Axis.Leisai_GetAxisStatus((ushort)AxisName.Y, ref axisYState);
+            Leisai_Axis.Z_Axis_Status = Leisai_Axis.Leisai_GetAxisStatus((ushort)AxisName.Z, ref axisZState);
+
+
+
+            Axis_INP.X_pos = Leisai_Axis.Leisai_GetEncoder((ushort)AxisName.X);
+            Axis_INP.Y_pos = Leisai_Axis.Leisai_GetEncoder((ushort)AxisName.Y);
+            Axis_INP.Z_pos = Leisai_Axis.Leisai_GetEncoder((ushort)AxisName.Z);
+            bool xReady, yReady, zReady;
+            if (Leisai_Axis.Leisai_CheckDone((ushort)AxisName.X) == 0)
+            {
+                TeachServer.Axis_X_TServer_State = true;
+            }
             else
-                LogManager.Log("机器人未连接", LogLevel.Warn, "Robot.Main");
+            {
+                xReady = true;
 
-            ///// 5. 初始化设备状态监控
-            var deviceIndices = ConfigService.GetDeviceStations();
-            var deviceCodes = deviceIndices.ToList();
-            CbxFacility.DataSource = deviceCodes;
-            CbxFacility.DisplayMember = "DeviceCode";   // 显示设备编号
-            CbxFacility.ValueMember = "Index";   // 选中时取设备索引
+                TeachServer.Axis_X_TServer_State = false;
+            }
+            if (Leisai_Axis.Leisai_CheckDone((ushort)AxisName.Y) == 0)
+            {
+                yReady = false;
+
+                TeachServer.Axis_Y_TServer_State = true;
+            }
+            else
+            {
+                yReady = true;
+                TeachServer.Axis_Y_TServer_State = false;
+            }
+            if (Leisai_Axis.Leisai_CheckDone((ushort)AxisName.Z) == 0)
+            {
+                zReady = false;
+                TeachServer.Axis_Z_TServer_State = true;
+            }
+            else
+            {
+                zReady = true;
+                TeachServer.Axis_Z_TServer_State = false;
+            }
+        }
+        private void OnSystemInitialized()
+        {
+            // 1. 更新UI状态
+            uiLight1.State = _initializer.IsRobotConnected
+                ? UILightState.On : UILightState.Off;
+
+            uiLight2.State = _initializer.IsPlcConnected
+                ? UILightState.On : UILightState.Off;
 
 
-            logBox = uiRichTextBox1;
-            //tabControl1.SelectedIndex = 1;
-            LogManager.Initialize(logBox);
-            LogManager.Log("日志系统初始化完成", LogLevel.Info);
+
+            // 3. 绑定设备监控事件
+            _deviceMonitor = _initializer.GetDeviceMonitor();
+            _plcConn = _initializer.GetPlcConnection();
+            if (_deviceMonitor != null)
+            {
+                _deviceMonitor.DeviceStatesUpdated += OnDeviceStatesUpdated;
+
+                // 立即触发一次状态更新
+                var currentStates = _deviceMonitor.CurrentDeviceStates;
+                if (currentStates != null)
+                {
+                    OnDeviceStatesUpdated(new Dictionary<string, DeviceMonitor.DeviceState>(currentStates));
+                }
+                else
+                {
+                    // 如果当前状态为空，手动设置所有设备为离线
+                    SetAllDevicesToOfflineUI();
+                }
+            }
+            else
+            {
+                // 设备监控为空时，设置所有设备为离线
+                SetAllDevicesToOfflineUI();
+            }
+
+            LogManager.Log("系统初始化完成", LogLevel.Info);
             uiButton1.BringToFront();
+        }
 
+        // 新增方法：设置所有设备UI为离线状态
+        private void SetAllDevicesToOfflineUI()
+        {
+            try
+            {
+                var allDeviceCodes = new[] { "V1", "U1", "S3", "M1", "S4", "C1", "R1", "G1",
+                                   "A1", "A2", "A3", "A4", "寻边机", "角度台", "LP1", "LP2" };
 
+                foreach (var deviceCode in allDeviceCodes)
+                {
+                    factoryLayoutControl1.SetDeviceBlockBorderColor(deviceCode, DeviceStatus.Offline);
+                    factoryLayoutControl2.SetDeviceBlockBorderColor(deviceCode, DeviceStatus.Offline);
+                }
+
+                // 更新连接指示灯
+                uiLight2.State = UILightState.Off;
+            }
+            catch (Exception ex)
+            {
+                LogManager.Log($"设置设备离线UI失败: {ex.Message}", LogLevel.Error);
+            }
         }
 
         private void OnDeviceStatesUpdated(Dictionary<string, DeviceMonitor.DeviceState> deviceStates)
@@ -733,28 +902,49 @@ namespace JLSoft.Wind
                 return;
             }
 
-            // 更新所有设备UI
-            foreach (var (deviceCode, state) in deviceStates)
+            // 获取DeviceMonitor的运行模式信息
+            bool isOfflineMode = _deviceMonitor?.IsOfflineMode ?? true;
+            bool isPlcConnected = _deviceMonitor?.IsPlcConnected ?? false;
+
+            // 根据运行模式更新设备UI
+            if (!isPlcConnected || isOfflineMode)
             {
-                UpdateDeviceUI(deviceCode, state);
+                SetAllDevicesToOfflineUI();
+                return;
             }
+
+            // 正常更新设备状态
+            if (deviceStates != null)
+            {
+                foreach (var (deviceCode, state) in deviceStates)
+                {
+                    UpdateDeviceUI(deviceCode, state);
+                }
+            }
+
+            // 更新连接指示器
+            UpdateConnectionIndicators(isPlcConnected, isOfflineMode);
         }
 
+
+        // 新增方法：更新连接指示灯
+        private void UpdateConnectionIndicators(bool isPlcConnected, bool isOfflineMode)
+        {
+            if (!isPlcConnected)
+            {
+                uiLight2.State = UILightState.Off; // PLC连接灯熄灭
+            }
+            else if (isOfflineMode)
+            {
+                uiLight2.State = UILightState.Blink; // PLC连接但处于离线模式，闪烁
+            }
+            else
+            {
+                uiLight2.State = UILightState.On; // PLC正常连接
+            }
+        }
         private void UpdateDeviceUI(string deviceCode, DeviceMonitor.DeviceState state)
         {
-            /* 暂时取消
-            Color color = Color.Gray;
-
-            if (state.Running) color = Color.Green;
-            else if (state.Idle) color = Color.Yellow;
-            else if (state.Paused) color = Color.Orange;
-            else if (state.Fault) color = Color.Red;
-
-            factoryLayoutControl1.SetDeviceBlockColor(deviceCode, color);
-
-            // 显示报警状态
-            factoryLayoutControl2.SetDeviceBlockColor(deviceCode, color);
-            */
 
             DeviceStatus deviceStatus = DeviceStatus.Idle;
 
@@ -782,10 +972,16 @@ namespace JLSoft.Wind
         {
             this.uiRichTextBox1.Text = string.Empty; // 清空日志
         }
-
+        /// <summary>
+        /// 停止
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void but_stop_Click(object sender, EventArgs e)
         {
-
+            Leisai_Axis.Leisai_Stop(0, 1);
+            Leisai_Axis.Leisai_Stop(1, 1);
+            Leisai_Axis.Leisai_Stop(2, 1);
         }
         /// <summary>
         /// 定点放片
@@ -794,113 +990,153 @@ namespace JLSoft.Wind
         /// <param name="e"></param>
         private async void but_orientation_up_Click(object sender, EventArgs e)
         {
-            _cts = new CancellationTokenSource();
-            var slot = cbx_Slot.Text;
-            int deviceIndex = 0; // U1为0，U2为1，依次类推
-            if (CbxFacility.Text == "")
-            {
-                MessageBox.Show("请先选择设备编号！");
-                return;
-            }
-            string deviceCode = CbxFacility.Text; // 例如从界面选择
-            var coord = new Positions();
-            if (string.IsNullOrEmpty(slot))
-            {
-                coord = ConfigService.FindPosition(deviceCode);
-            }
-            else
-            {
-                coord = ConfigService.FindPosition(deviceCode, slot);
-            }
-            deviceIndex = ConfigService.GetDeviceIndex(deviceCode);
-            if (deviceIndex < 0)
-            {
-                MessageBox.Show($"PLC 配置中未找到设备编号: {deviceCode}");
-                return;
-            }
-            var plcConn = _coordinator.GetPlcConnection(1); // 1为主PLC站号
 
-            if (plcConn == null)
-            {
-                MessageBox.Show("PLC连接未初始化！");
-                return;
-            }
-            if (!plcConn.IsConnected)
-                await plcConn.ConnectAsync();
-            _executor = new SequenceTaskExecutor(plcConn, deviceIndex, slot, coord, _deviceMonitor);
+            await AsyncOperations.RunWithLoading(
+                       this,
+                       async (ct) =>
+                       {
+                           _cts = new CancellationTokenSource();
+                           var slot = cbx_Slot.Text;
+                           int deviceIndex = 0; // U1为0，U2为1，依次类推
+                           if (CbxFacility.Text == "")
+                           {
+                               MessageBox.Show("请先选择设备编号！");
+                               return false;
+                           }
+                           string deviceCode = CbxFacility.Text; // 例如从界面选择
+                           var coord = new Positions();
+                           var biename = "";
+                           if (string.IsNullOrEmpty(slot))
+                           {
+                               coord = ConfigService.FindPosition(deviceCode);
+                               biename = ConfigService.FindbieName(deviceCode);
+                           }
+                           else
+                           {
+                               coord = ConfigService.FindPosition(deviceCode, slot);
+                               biename = ConfigService.FindbieName(deviceCode, slot);
+                           }
+                           deviceIndex = ConfigService.GetDeviceIndex(deviceCode);
+                           if (deviceIndex < 0)
+                           {
+                               MessageBox.Show($"PLC 配置中未找到设备编号: {deviceCode}");
+                               return false;
+                           }
+                           var plcConn = _coordinator?.GetPlcConnection(1); // 1为主PLC站号
 
-            try
-            {
-                await _executor.PutRunAsync(_cts.Token);
-                LogManager.Log($"时序任务{deviceIndex}完成！");
-            }
-            catch (OperationCanceledException)
-            {
-                LogManager.Log($"时序任务{deviceIndex}被取消。", LogLevel.Warn);
-            }
-            catch (Exception ex)
-            {
-                LogManager.Log($"时序任务{deviceIndex}异常: {ex.Message}", LogLevel.Error);
-            }
+                           //if (plcConn == null)
+                           //{
+                           //    MessageBox.Show("PLC连接未初始化！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                           //    return;
+                           //}
+                           //if (!plcConn.IsConnected)
+                           //    await plcConn.ConnectAsync();
+                           //_executor = new SequenceTaskExecutor(plcConn, deviceIndex, slot, coord, _deviceMonitor, _dbService);
+
+                           try
+                           {
+                               await PackageMove.OneKeyGetPut(coord, biename, slot, false);
+                               //await _executor.GetRunAsync(_cts.Token);
+                               LogManager.Log($"时序任务{deviceIndex}完成！");
+                           }
+                           catch (OperationCanceledException)
+                           {
+                               LogManager.Log($"时序任务{deviceIndex}被取消。", LogLevel.Warn);
+                           }
+                           catch (Exception ex)
+                           {
+                               LogManager.Log($"时序任务{deviceIndex}异常: {ex.Message}", LogLevel.Error);
+                           }
+                           return true; // 需要返回任意值
+                       }
+                   );
+            
         }
         /// <summary>
-        /// 
+        /// 定点取片
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private async void but_orientation_dow_Click(object sender, EventArgs e)
         {
-            _cts = new CancellationTokenSource();
-            int deviceIndex = 0; // U1为0，U2为1，依次类推
-            var slot = cbx_Slot.Text;
-            if (CbxFacility.Text == "")
-            {
-                MessageBox.Show("请先选择设备编号！");
-                return;
-            }
-            string deviceCode = CbxFacility.Text; // 例如从界面选择
-            deviceIndex = ConfigService.GetDeviceIndex(deviceCode);
-            if (deviceIndex < 0)
-            {
-                MessageBox.Show($"PLC 配置中未找到设备编号: {deviceCode}");
-                return;
-            }
-            var plcConn = _coordinator.GetPlcConnection(1); // 1为主PLC站号
-            var coord = new Positions();
-            if (string.IsNullOrEmpty(slot))
-            {
-                coord = ConfigService.FindPosition(deviceCode);
-            }
-            else
-            {
-                coord = ConfigService.FindPosition(deviceCode, slot);
-            }
-            if (plcConn == null)
-            {
-                MessageBox.Show("PLC连接未初始化！");
-                return;
-            }
-            if (!plcConn.IsConnected)
-                await plcConn.ConnectAsync();
-            _executor = new SequenceTaskExecutor(plcConn, deviceIndex, slot, coord, _deviceMonitor);
+            await AsyncOperations.RunWithLoading(
+                       this,
+                       async (ct) =>
+                       {
+                           _cts = new CancellationTokenSource();
+                           int deviceIndex = 0; // U1为0，U2为1，依次类推
+                           var slot = cbx_Slot.Text;
+                           if (CbxFacility.Text == "")
+                           {
+                               MessageBox.Show("请先选择设备编号！");
+                               return false;
+                           }
+                           string deviceCode = CbxFacility.Text; // 例如从界面选择
+                           deviceIndex = ConfigService.GetDeviceIndex(deviceCode);
+                           if (deviceIndex < 0)
+                           {
+                               MessageBox.Show($"PLC 配置中未找到设备编号: {deviceCode}");
+                               return false;
+                           }
+                           var plcConn = _coordinator?.GetPlcConnection(1); // 1为主PLC站号
+                           var coord = new Positions();
+                           if (string.IsNullOrEmpty(slot))
+                           {
+                               coord = ConfigService.FindPosition(deviceCode);
+                           }
+                           else
+                           {
+                               coord = ConfigService.FindPosition(deviceCode, slot);
+                           }
+                           //if (plcConn == null)
+                           //{
+                           //    MessageBox.Show("PLC连接未初始化！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                           //    return;
+                           //}
+                           //if (!plcConn.IsConnected)
+                           //    await plcConn.ConnectAsync();
+                           //_executor = new SequenceTaskExecutor(plcConn, deviceIndex, slot, coord, _deviceMonitor, _dbService);
 
-            try
-            {
-                await _executor.GetRunAsync(_cts.Token);
-                LogManager.Log($"时序任务{deviceIndex}完成！");
-            }
-            catch (OperationCanceledException)
-            {
-                LogManager.Log($"时序任务{deviceIndex}被取消。", LogLevel.Warn);
-            }
-            catch (Exception ex)
-            {
-                LogManager.Log($"时序任务{deviceIndex}异常: {ex.Message}", LogLevel.Error);
-            }
+                           try
+                           {
+
+                               string biename = "";
+                               if (string.IsNullOrEmpty(slot))
+                               {
+                                   coord = ConfigService.FindPosition(deviceCode);
+                                   biename = ConfigService.FindbieName(deviceCode);
+                               }
+                               else
+                               {
+                                   coord = ConfigService.FindPosition(deviceCode, slot);
+                                   biename = ConfigService.FindbieName(deviceCode, slot);
+                               }
+                               var sta = StationName.ChangeStaName(biename);
+                               if (slot == null || slot == "")
+                               {
+                                   slot = "1";
+                               }
+                               await PackageMove.OneKeyGetPut(coord, biename, slot, true);
+                               //await _executor.GetRunAsync(_cts.Token);
+                               LogManager.Log($"时序任务{deviceIndex}完成！");
+                           }
+                           catch (OperationCanceledException)
+                           {
+                               LogManager.Log($"时序任务{deviceIndex}被取消。", LogLevel.Warn);
+                           }
+                           catch (Exception ex)
+                           {
+                               LogManager.Log($"时序任务{deviceIndex}异常: {ex.Message}", LogLevel.Error);
+                           }
+                           return true; // 需要返回任意值
+                       }
+                   );
+            
         }
 
         private void CbxFacility_SelectedIndexChanged(object sender, EventArgs e)
         {
+
             if (CbxFacility.SelectedItem is DeviceIndices selectedDevice)
             {
                 if (selectedDevice.SubStations != null && selectedDevice.SubStations.Any())
@@ -920,6 +1156,7 @@ namespace JLSoft.Wind
                     cbx_Slot.Enabled = false;
                 }
             }
+
         }
         /// <summary>
         /// 
@@ -935,6 +1172,589 @@ namespace JLSoft.Wind
         }
 
         private void 测试ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+        /// <summary>
+        /// 工程师模式/急停
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void but_GCStop_Click(object sender, EventArgs e)
+        {
+            Leisai_Axis.Leisai_Stop(0, 1);
+            Leisai_Axis.Leisai_Stop(1, 1);
+            Leisai_Axis.Leisai_Stop(2, 1);
+        }
+        /// <summary>
+        /// 工程师模式/复位
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void but_GCReset_Click(object sender, EventArgs e)
+        {
+            await AsyncOperations.RunWithLoading(
+                       this,
+                       async (ct) =>
+                       {
+                           await Reset();
+                           return true; // 需要返回任意值
+                       },
+                       "系统复位中\n请稍候..."
+                   );
+        }
+        /// <summary>
+        /// 复位
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void but_Reset_Click(object sender, EventArgs e)
+        {
+            await AsyncOperations.RunWithLoading(
+                       this,
+                       async (ct) =>
+                       {
+                           await Reset();
+                           return true; // 需要返回任意值
+                       },
+                       "系统复位中\n请稍候..."
+                   );
+        }
+        /// <summary>
+        /// 复位回原点
+        /// </summary>
+        /// <returns></returns>
+        private async Task Reset()
+        {
+            CancellationToken cts = new CancellationToken();
+            await HWRobot.Robot_InitAsync(cts);
+            // Y轴和Z轴并行回零
+            bool homeY_State = await Leisai_Home((ushort)AxisName.Y); // Y轴
+            await Leisai_Axis_Y_SafetyPoint_Pmov();
+            bool homeZ_State = await Leisai_Home((ushort)AxisName.Z); // Z轴
+
+            Task isAlignerInit = HWAligner.Aligner_InitAsync(cts);
+            Task isLoadportInit_1 = HWLoadPort_1.LoadPort1_InitAsync(cts);
+            Task isLoadportInit_2 = HWLoadPort_2.LoadPort2_InitAsync(cts);
+            Task isOCR_Aligner = OCR_Aligner.OCR_Aligner_InitAsync();
+            Task isOCR_AngleT = OCR_AngleT.OCR_AngleT_InitAsync();
+            await Task.WhenAll(isAlignerInit, isLoadportInit_1, isLoadportInit_2, isOCR_Aligner, isOCR_AngleT);
+
+            if (homeZ_State && homeY_State)
+            {
+                // X轴回零（依赖于Y轴和Z轴完成）
+                bool homeX_State = await Leisai_Home((ushort)AxisName.X); // X轴
+                await Leisai_Axis.Leisai_Pmov((ushort)AxisName.X, 100, 1);
+
+            }
+            else
+            {
+                MessageBox.Show("Y轴或Z轴回零失败，请检查轴状态。");
+            }
+        }
+        /// <summary>
+        /// 单步移动
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void but_moveget_Click(object sender, EventArgs e)
+        {
+
+            await AsyncOperations.RunWithLoading(
+                       this,
+                       async (ct) =>
+                       {
+                           int deviceIndex = 0; // U1为0，U2为1，依次类推
+                           if (CbxFacility.Text == "")
+                           {
+                               MessageBox.Show("请先选择设备编号！");
+                               return false;
+                           }
+                           string deviceCode = CbxFacility.Text; // 例如从界面选择
+
+                           factoryLayoutControl1.SmoothMoveRobotToDevice(deviceCode);
+                           factoryLayoutControl2.SmoothMoveRobotToDevice(deviceCode);
+
+                           var coord = new Positions();
+                           var slot = cbx_Slot.Text;
+                           var biename = "";
+                           if (string.IsNullOrEmpty(slot))
+                           {
+                               coord = ConfigService.FindPosition(deviceCode);
+                               biename = ConfigService.FindbieName(deviceCode);
+                           }
+                           else
+                           {
+                               coord = ConfigService.FindPosition(deviceCode, slot);
+                               biename = ConfigService.FindbieName(deviceCode, slot);
+                           }
+                           deviceIndex = ConfigService.GetDeviceIndex(deviceCode);
+                           if (deviceIndex < 0)
+                           {
+                               MessageBox.Show($"PLC 配置中未找到设备编号: {deviceCode}");
+                               return false;
+                           }
+                           var robotManager = HWRobot._robot.IsConnected;
+                           if (robotManager)
+                           {
+                               //CancellationToken cts = new CancellationToken();
+                               //System.Enum.TryParse<Station>(deviceCode, out Station station);
+                               //await Leisai_Axis.AxisMovStation(deviceCode, coord);
+                               //await Task.Delay(500);
+                               await PackageMove.MoveGetReadyPos(coord, biename, slot, true);
+                           }
+                           else
+                           {
+                               LogManager.Log("ROBOT: 机器人未连接，无法执行准备动作", LogLevel.Warn, "Robot.Main");
+                               return false;
+                           }
+                           return true; // 需要返回任意值
+                       }
+                   );
+            
+
+        }
+
+        private async void but_moveput_Click(object sender, EventArgs e)
+        {
+            await AsyncOperations.RunWithLoading(
+                       this,
+                       async (ct) =>
+                       {
+                           int deviceIndex = 0; // U1为0，U2为1，依次类推
+                           if (CbxFacility.Text == "")
+                           {
+                               MessageBox.Show("请先选择设备编号！");
+                               return false;
+                           }
+                           string deviceCode = CbxFacility.Text; // 例如从界面选择
+
+                           factoryLayoutControl1.SmoothMoveRobotToDevice(deviceCode);
+                           factoryLayoutControl2.SmoothMoveRobotToDevice(deviceCode);
+
+                           var coord = new Positions();
+                           var slot = cbx_Slot.Text;
+                           var biename = "";
+                           if (string.IsNullOrEmpty(slot))
+                           {
+                               coord = ConfigService.FindPosition(deviceCode);
+                               biename = ConfigService.FindbieName(deviceCode);
+                           }
+                           else
+                           {
+                               coord = ConfigService.FindPosition(deviceCode, slot);
+                               biename = ConfigService.FindbieName(deviceCode, slot);
+                           }
+                           deviceIndex = ConfigService.GetDeviceIndex(deviceCode);
+                           if (deviceIndex < 0)
+                           {
+                               MessageBox.Show($"PLC 配置中未找到设备编号: {deviceCode}");
+                               return false;
+                           }
+                           var robotManager = HWRobot._robot.IsConnected;
+                           if (robotManager)
+                           {
+                               //CancellationToken cts = new CancellationToken();
+                               //System.Enum.TryParse<Station>(deviceCode, out Station station);
+                               //await Leisai_Axis.AxisMovStation(deviceCode, coord);
+                               //await Task.Delay(500);
+                               await PackageMove.MoveGetReadyPos(coord, biename, slot, false);
+                           }
+                           else
+                           {
+                               LogManager.Log("ROBOT: 机器人未连接，无法执行准备动作", LogLevel.Warn, "Robot.Main");
+                               return false;
+                           }
+                           return true; // 需要返回任意值
+                       }
+                   );
+
+            
+
+        }
+        /// <summary>
+        /// 工程师模式/上电
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void but_GCPowered_Click(object sender, EventArgs e)
+        {
+            bool initSuccess = await _initializer.InitializeAsync();
+            if (!initSuccess)
+            {
+                uiLight1.State = UILightState.Off;
+                uiLight2.State = UILightState.Off;
+                LogManager.Log("连接初始化失败", LogLevel.Error);
+            }
+        }
+        /// <summary>
+        /// 卸载
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void uiButton2_Click(object sender, EventArgs e)
+        {
+            if (LeisaiIO.Robot_Ready && !LeisaiIO.Robot_Fault)
+            {
+
+                var coord = new Positions();
+                var biename = "";
+                if (uiRadioButton1.Checked)
+                {
+                    coord = ConfigService.FindPosition("LP1", "1");
+                    biename = ConfigService.FindbieName("LP1", "1");
+                    await HWLoadPort_1.LoadPort1_LoadAsync();
+                    if (wafer_type.Text == "Square")
+                    {
+                        var xRdy = Leisai_Axis.Leisai_CheckDone(0);
+                        var yRdy = Leisai_Axis.Leisai_CheckDone(1);
+                        var xRdz = Leisai_Axis.Leisai_CheckDone(2);
+                        if (xRdy == 0 && yRdy == 0 && xRdz == 0)
+                        {
+                            var sta = StationName.ChangeStaName(biename);
+                            await PackageMove.MapAsync(sta, coord);
+                        }
+                    }
+
+                }
+                else if (uiRadioButton2.Checked)
+                {
+
+                    coord = ConfigService.FindPosition("LP2", "1");
+                    biename = ConfigService.FindbieName("LP2", "1");
+                    await HWLoadPort_2.LoadPort2_LoadAsync();
+                    if (wafer_type.Text == "Square")
+                    {
+                        var xRdy = Leisai_Axis.Leisai_CheckDone(0);
+                        var yRdy = Leisai_Axis.Leisai_CheckDone(1);
+                        var xRdz = Leisai_Axis.Leisai_CheckDone(2);
+                        if (xRdy == 0 && yRdy == 0 && xRdz == 0)
+                        {
+                            var sta = StationName.ChangeStaName(biename);
+                            await PackageMove.MapAsync(sta, coord);
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+                LogManager.Log("Robot处于Run状态", LogLevel.Warn);
+            }
+
+        }
+        /// <summary>
+        /// 装载
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void uiButton3_Click(object sender, EventArgs e)
+        {
+            if (uiRadioButton1.Checked)
+            {
+                await HWLoadPort_1.LoadPort1_UnloadAsync();
+            }
+            else if (uiRadioButton2.Checked)
+            {
+                await HWLoadPort_2.LoadPort2_UnloadAsync();
+            }
+        }
+        /// <summary>
+        /// 扫片装载
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void but_MapLoad_Click(object sender, EventArgs e)
+        {
+
+            if (uiRadioButton1.Checked)
+            {
+                Leisai_Axis.SetProfileUnit((ushort)AxisName.Y, 0, Leisai_Axis.Axis_Y_Speed);
+                await Leisai_Axis.Leisai_Axis_Y_SafetyPoint_Pmov();
+                Console.WriteLine("Y轴已移动至安全位");
+                await HWLoadPort_1.LoadPort1_MapLoadAsync();
+
+                await HWLoadPort_1.LP1ReadMappingAsync();
+            }
+            else if (uiRadioButton2.Checked)
+            {
+                Leisai_Axis.SetProfileUnit((ushort)AxisName.Y, 0, Leisai_Axis.Axis_Y_Speed);
+                await Leisai_Axis.Leisai_Axis_Y_SafetyPoint_Pmov();
+                Console.WriteLine("Y轴已移动至安全位");
+                await HWLoadPort_2.LoadPort2_MapLoadAsync();
+
+                await HWLoadPort_2.LP2ReadMappingAsync();
+            }
+        }
+        /// <summary>
+        /// 扫片卸载
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void but_MapUnLoad_Click(object sender, EventArgs e)
+        {
+            if (uiRadioButton1.Checked)
+            {
+                Leisai_Axis.SetProfileUnit((ushort)AxisName.Y, 0, Leisai_Axis.Axis_Y_Speed);
+                await Leisai_Axis.Leisai_Axis_Y_SafetyPoint_Pmov();
+                Console.WriteLine("Y轴已移动至安全位");
+                await HWLoadPort_1.LoadPort1_UnMaploadAsync();
+
+                await HWLoadPort_1.LP1ReadMappingAsync();
+            }
+            else if (uiRadioButton2.Checked)
+            {
+                Leisai_Axis.SetProfileUnit((ushort)AxisName.Y, 0, Leisai_Axis.Axis_Y_Speed);
+                await Leisai_Axis.Leisai_Axis_Y_SafetyPoint_Pmov();
+                Console.WriteLine("Y轴已移动至安全位");
+                await HWLoadPort_2.LoadPort2_UnMaploadAsync();
+
+                await HWLoadPort_2.LP2ReadMappingAsync();
+            }
+        }
+        /// <summary>
+        /// 移动至中心位置
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void but_MTM_Click(object sender, EventArgs e)
+        {
+            await AsyncOperations.RunWithLoading(
+                       this,
+                       async (ct) =>
+                       {
+                           if (cbx_Aligner.Text == "Aligner")
+                           {
+                               await HWAligner.Aligner_MoveToCenter();
+                           }
+                           else if (cbx_Aligner.Text == "AngleT")
+                           {
+                               await AngleT.MTMAsync();
+                           }
+                           return true; // 需要返回任意值
+                       },
+                       "寻找中心\n请稍候..."
+                   );
+            
+        }
+        /// <summary>
+        /// 寻边
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void but_BAL_Click(object sender, EventArgs e)
+        {
+            await AsyncOperations.RunWithLoading(
+                       this,
+                       async (ct) =>
+                       {
+                           if (cbx_Aligner.Text == "Aligner")
+                           {
+                               await HWAligner.Aligner_BAL();
+
+                           }
+                           else if (cbx_Aligner.Text == "AngleT")
+                           {
+                               await AngleT.AngleTOneKeyBALAsync();
+                           }
+                           return true; // 需要返回任意值
+                       },
+                       "寻找边缘\n请稍候..."
+                   );
+            
+        }
+        /// <summary>
+        /// 读取Code
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void but_OCRTirg_Click(object sender, EventArgs e)
+        {
+            await AsyncOperations.RunWithLoading(
+                       this,
+                       async (ct) =>
+                       {
+                           if (cbx_OCR.Text == "Aligner")
+                           {
+                               var ret = await OCR_Aligner.OCR_Aligner_Trig();
+                               txt_WaferID.Text = ret;
+                           }
+                           else if (cbx_OCR.Text == "AngleT")
+                           {
+                               var ret = await OCR_AngleT.OCR_AngleT_Trig();
+                               txt_WaferID.Text = ret;
+                           }
+                           return true; // 需要返回任意值
+                       },
+                       "读取Code\n请稍候..."
+                   );
+            
+        }
+        /// <summary>
+        /// Wafer选择
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void panel8_Click(object sender, EventArgs e)
+        {
+            await WaferSelect();
+        }
+
+        private async Task WaferSelect()
+        {
+            using (WaferSelectionForm waferForm = new WaferSelectionForm(_currentWaferType, _currentWaferSize))
+            {
+                if (waferForm.ShowDialog() == DialogResult.OK)
+                {
+                    _currentWaferSize = waferForm.SelectedSize;
+                    _currentWaferType = waferForm.SelectedWaferType;
+                    // 显示选择结果
+                    wafer_type.Text = waferForm.SelectedWaferType;
+                    wafer_size.Text = waferForm.SelectedSize;
+
+                    // 这里可以添加自动开始的逻辑代码
+                    //StartAutoRun(waferForm.SelectedWaferType, waferForm.SelectedSize);
+
+                    await WaferTypeGetStaName();
+                }
+                else
+                {
+                    MessageBox.Show("已取消自动开始操作");
+                }
+            }
+        }
+
+        public async Task WaferTypeGetStaName()
+        {
+            string groupSta = "";
+            bool typ = wafer_type.Text == "Wafer";
+            bool siz = wafer_size.Text == "8英寸";
+            if (typ && siz)
+            {
+                groupSta = StationName.GetWaferType(Group.Wafer8);
+            }
+            else if (typ && !siz)
+            {
+                groupSta = StationName.GetWaferType(Group.Wafer12);
+            }
+            else if (!typ && siz)
+            {
+                groupSta = StationName.GetWaferType(Group.Square8);
+            }
+            else if (!typ && !siz)
+            {
+                groupSta = StationName.GetWaferType(Group.Square12);
+            }
+            await HWRobot.SGRPAsync(groupSta);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void 雷赛IO卡ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (LeiSaiFrm leiSaiFrm = new LeiSaiFrm())
+            {
+                leiSaiFrm.ShowDialog();
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void 运动控制卡ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void axisToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (AxisFrm axisFrm = new AxisFrm())
+            {
+                axisFrm.ShowDialog();
+            }
+        }
+        #region 清除报警操作
+        private async void ErrorClear_lp1_Click(object sender, EventArgs e)
+        {
+            await AsyncOperations.RunWithLoading(
+                        this,
+                        async (ct) =>
+                        {
+                            await HWLoadPort_1.LoadPort1_ClearingErrorAsync();
+                            await HWLoadPort_1.LoadPort1_HomeAsync();
+                            return true; // 需要返回任意值
+                        }
+                    );
+            
+        }
+
+        private async void ErrorClear_lp2_Click(object sender, EventArgs e)
+        {
+            await AsyncOperations.RunWithLoading(
+                        this,
+                        async (ct) =>
+                        {
+                            await HWLoadPort_2.LoadPort2_ClearingErrorAsync();
+                            await HWLoadPort_2.LoadPort2_HomeAsync();
+                            return true; // 需要返回任意值
+                        }
+                    );
+        }
+
+        private async void ErrorClear_robot_Click(object sender, EventArgs e)
+        {
+            await AsyncOperations.RunWithLoading(
+                        this,
+                        async (ct) =>
+                        {
+                            await HWRobot.Robot_RemsAsync();
+                            await HWRobot.Robot_SvonAsync();
+                            return true; // 需要返回任意值
+                        }
+                    );
+        }
+
+        private async void ErrorClear_Aligner_Click(object sender, EventArgs e)
+        {
+            await AsyncOperations.RunWithLoading(
+                        this,
+                        async (ct) =>
+                        {
+                            await HWAligner._aligner.ClearAlarmAsync();
+                            await HWAligner.Aligner_Setting();
+                            // await HWAligner.Aligner_InitAsync();
+                            return true; // 需要返回任意值
+                        }
+                    );
+            
+        }
+
+        private async void ErrorClear_AngleT_Click(object sender, EventArgs e)
+        {
+            await AsyncOperations.RunWithLoading(
+                        this,
+                        async (ct) =>
+                        {
+                            await AngleT.AngleTInitAsync();
+                            await AngleT.HomeAsync();
+                            return true; // 需要返回任意值
+                        }
+                    );
+        }
+
+        private void ErrorClear_Axis_Click(object sender, EventArgs e)
+        {
+            Leisai_Axis.Leisai_nmcClearErrcode();
+
+        }
+
+        #endregion
+
+
+        private void uiButton2_Click_1(object sender, EventArgs e)
         {
 
         }

@@ -9,7 +9,7 @@ namespace JLSoft.Wind.Enum
     /// <summary>
     /// 状态枚举，表示设备的不同状态。
     /// </summary>
-    public enum DeviceStatus
+    public enum DeviceStatusPLC
     {
         /// <summary>
         /// 未知状态

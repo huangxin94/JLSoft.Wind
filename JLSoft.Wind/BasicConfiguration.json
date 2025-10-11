@@ -1,0 +1,768 @@
+{
+  "Robot": {
+    "IPAddress": "192.168.29.130",
+    "Port": 8001
+  },
+  "Slplc": {
+    "IPAddress": "10.10.10.39",
+    "Port": 8000
+  },
+  "AngleTConfig": {
+    "Ip": "192.168.1.3",
+    "Port": 8080,
+    "Angle":"180"
+
+  },
+ "AlignerConfig": {
+    "ComPort": "COM3",
+    "GLM": "1",
+    "WT": "1",
+    "FWO": "1000"
+  },
+  "LoadPort1Config": "COM1",
+  "LoadPort2Config": "COM2",
+  "AlignerOCRConfig": {
+    "IPAddress": "192.168.1.11",
+    "Port": 8500
+  },
+  "AngleTOCRConfig": {
+    "IPAddress": "192.168.1.10",
+    "Port": 8500
+  },
+ "TeachServerConfig": {
+    "IPAddress": "192.168.1.252",
+    "Port": 8600
+  },
+  "DeviceIndices": [
+    {
+      "DeviceCode": "V1",
+      "bieName": "M",
+      "Index": 0,
+      "Positions": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SubStations": [
+        {
+          "Name": "UP",
+          "bieName": "M",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "DOWN",
+          "bieName": "M",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 120
+          }
+        }
+      ]
+    },
+    {
+      "DeviceCode": "U1",
+      "bieName": "B",
+      "Index": 1,
+      "Positions": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SubStations": [
+        {
+          "Name": "UP",
+          "bieName": "BA",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "DOWN",
+          "bieName": "BB",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 120
+          }
+        }
+      ]
+    },
+    {
+      "DeviceCode": "S3",
+      "bieName": "O",
+      "Index": 2,
+      "Positions": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SubStations": [
+        {
+          "Name": "UP",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "DOWN",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 120
+          }
+        }
+      ]
+    },
+    {
+      "DeviceCode": "M1",
+      "bieName": "N",
+      "Index": 3,
+      "Positions": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SubStations": [
+
+      ]
+    },
+    {
+      "DeviceCode": "S4",
+      "bieName": "L",
+      "Index": 4,
+      "Positions": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SubStations": [
+
+      ]
+    },
+    {
+      "DeviceCode": "C1",
+      "bieName": "P",
+      "Index": 5,
+      "Positions": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SubStations": [
+
+      ]
+    },
+    {
+      "DeviceCode": "R1",
+      "bieName": "AA",
+      "Index": 6,
+      "Positions": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SubStations": [
+
+      ]
+    },
+    {
+      "DeviceCode": "G1",
+      "bieName": "Q",
+      "Index": 7,
+      "Positions": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SubStations": [
+
+      ]
+    },
+    {
+      "DeviceCode": "A1",
+      "bieName": "R",
+      "Index": 8,
+      "Positions": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SubStations": [
+
+      ]
+    },
+    {
+      "DeviceCode": "A2",
+      "bieName": "S",
+      "Index": 9,
+      "Positions": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SubStations": [
+
+      ]
+    },
+    {
+      "DeviceCode": "A3",
+      "bieName": "T",
+      "Index": 10,
+      "Positions": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SubStations": [
+
+      ]
+    },
+    {
+      "DeviceCode": "A4",
+      "bieName": "U",
+      "Index": 11,
+      "Positions": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SubStations": [
+
+      ]
+    },
+    {
+      "DeviceCode": "LP1",
+      "bieName": "F",
+      "Index": 12,
+      "Positions": {
+        "X": 633.146,
+        "Y": 71.635,
+        "Z": 19.13
+      },
+      "SubStations": [
+        {
+          "Name": "1",
+          "bieName": "F",
+          "Positions": {
+            "X": 633.146,
+            "Y": 71.635,
+            "Z": 19.13
+          }
+        },
+        {
+          "Name": "2",
+          "bieName": "F",
+          "Positions": {
+            "X": 633.146,
+            "Y": 71.635,
+            "Z": 19.13
+          }
+        },
+        {
+          "Name": "3",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "4",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "5",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "6",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "7",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "8",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "9",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "10",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "11",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "12",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "13",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "14",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "15",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "16",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "17",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "18",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "19",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "20",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "21",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "22",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "23",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "24",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "25",
+          "bieName": "F",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        }
+      ]
+    },
+    {
+      "DeviceCode": "LP2",
+      "bieName": "G",
+      "Index": 13,
+      "Positions": {
+        "X": 147.614,
+        "Y": 71.64,
+        "Z": 19.13
+      },
+      "SubStations": [
+        {
+          "Name": "1",
+          "bieName": "G",
+          "Positions": {
+            "X": 147.614,
+            "Y": 71.64,
+            "Z": 19.13
+          }
+        },
+        {
+          "Name": "2",
+          "bieName": "G",
+          "Positions": {
+            "X": 147.614,
+            "Y": 71.64,
+            "Z": 19.13
+          }
+        },
+        {
+          "Name": "3",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "4",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "5",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "6",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "7",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "8",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "9",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "10",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "11",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "12",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "13",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "14",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "15",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "16",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "17",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "18",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "19",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "20",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "21",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "22",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "23",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "24",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        },
+        {
+          "Name": "25",
+          "bieName": "G",
+          "Positions": {
+            "X": 110,
+            "Y": 102,
+            "Z": 100
+          }
+        }
+
+      ]
+    },
+    {
+      "DeviceCode": "角度台",
+      "bieName": "I",
+      "Index": 14,
+      "Positions": {
+        "X": 2337.002,
+        "Y": 86.46,
+        "Z": 65.59
+      },
+      "SubStations": [
+
+      ]
+    },
+    {
+      "DeviceCode": "寻边机",
+      "bieName": "H",
+      "Index": 15,
+      "Positions": {
+        "X": 1815.871,
+        "Y": 98.849,
+        "Z": 61.937
+      },
+      "SubStations": [
+
+      ]
+    }
+
+  ],
+  "Users": [
+    {
+      "UserId": 100193,
+      "Username": "黄心",
+      "Password": "123456",
+      "Grade": "超级管理员",
+      "LastUpdate": "2025-05-29T11:04:37.0726537+08:00"
+    },
+    {
+      "UserId": 100192,
+      "Username": "张三",
+      "Password": "123456",
+      "Grade": "普通用户",
+      "LastUpdate": "2025-05-29T11:07:48.3718764+08:00"
+    },
+    {
+      "UserId": 100191,
+      "Username": "李四",
+      "Password": "123456",
+      "Grade": "工程师",
+      "LastUpdate": "2025-06-06T10:38:43.8026439+08:00"
+    }
+  ]
+}

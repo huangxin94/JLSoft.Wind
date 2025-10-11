@@ -72,7 +72,7 @@ namespace JLSoft.Wind.Services.Connect
                         IsConnected = result.IsSuccess;
 
                         LogManager.Log(result.IsSuccess ?
-                            "PLC连接成功" : $"PLC连接失败: {result.Message}",Sunny.UI.LogLevel.Info, "PLC.Main");
+                            "PLC连接成功" : $"PLC连接失败: {result.Message}", result.IsSuccess ? Sunny.UI.LogLevel.Info : Sunny.UI.LogLevel.Warn, "PLC.Main");
 
                         return result;
                     }

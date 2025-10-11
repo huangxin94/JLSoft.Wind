@@ -36,24 +36,43 @@
             dataGridView1 = new DataGridView();
             panel3 = new Panel();
             uiGroupBox4 = new Sunny.UI.UIGroupBox();
+            uiButton2 = new Sunny.UI.UIButton();
             but_readout = new Sunny.UI.UIButton();
             but_readin = new Sunny.UI.UIButton();
             but_stop = new Sunny.UI.UIButton();
             but_uppower = new Sunny.UI.UIButton();
-            uiButton6 = new Sunny.UI.UIButton();
+            but_Reset = new Sunny.UI.UIButton();
             uiPanel1 = new Sunny.UI.UIPanel();
             factoryLayoutControl2 = new JLSoft.Wind.UserControl.FactoryLayoutControl();
             tabPage2 = new TabPage();
             dataGridView2 = new DataGridView();
             panel4 = new Panel();
             uiGroupBox5 = new Sunny.UI.UIGroupBox();
-            uiButton10 = new Sunny.UI.UIButton();
-            uiButton11 = new Sunny.UI.UIButton();
-            uiButton12 = new Sunny.UI.UIButton();
+            but_GCStop = new Sunny.UI.UIButton();
+            but_GCPowered = new Sunny.UI.UIButton();
+            but_GCReset = new Sunny.UI.UIButton();
+            uiGroupBox9 = new Sunny.UI.UIGroupBox();
+            ErrorClear_Axis = new Sunny.UI.UIButton();
+            ErrorClear_AngleT = new Sunny.UI.UIButton();
+            ErrorClear_Aligner = new Sunny.UI.UIButton();
+            ErrorClear_robot = new Sunny.UI.UIButton();
+            ErrorClear_lp2 = new Sunny.UI.UIButton();
+            ErrorClear_lp1 = new Sunny.UI.UIButton();
+            uiGroupBox3 = new Sunny.UI.UIGroupBox();
+            but_OCRTirg = new Sunny.UI.UIButton();
+            but_OCRStatue = new Button();
+            uiLabel3 = new Sunny.UI.UILabel();
+            txt_WaferID = new Sunny.UI.UITextBox();
+            cbx_OCR = new Sunny.UI.UIComboBox();
+            uiGroupBox2 = new Sunny.UI.UIGroupBox();
+            but_BAL = new Sunny.UI.UIButton();
+            but_MTM = new Sunny.UI.UIButton();
+            cbx_Aligner = new Sunny.UI.UIComboBox();
             uiGroupBox6 = new Sunny.UI.UIGroupBox();
-            uiButton4 = new Sunny.UI.UIButton();
-            cbx_Slot = new Sunny.UI.UIComboBox();
+            but_movePUT = new Sunny.UI.UIButton();
             but_orientation_up = new Sunny.UI.UIButton();
+            cbx_Slot = new Sunny.UI.UIComboBox();
+            but_moveGET = new Sunny.UI.UIButton();
             but_orientation_dow = new Sunny.UI.UIButton();
             CbxFacility = new Sunny.UI.UIComboBox();
             uiGroupBox7 = new Sunny.UI.UIGroupBox();
@@ -62,8 +81,10 @@
             uiTextBox1 = new Sunny.UI.UITextBox();
             uiLabel1 = new Sunny.UI.UILabel();
             uiGroupBox8 = new Sunny.UI.UIGroupBox();
-            uiButton3 = new Sunny.UI.UIButton();
-            uiButton2 = new Sunny.UI.UIButton();
+            but_MapLoad = new Sunny.UI.UIButton();
+            but_MapUnLoad = new Sunny.UI.UIButton();
+            but_UnLoad = new Sunny.UI.UIButton();
+            but_Load = new Sunny.UI.UIButton();
             uiRadioButton2 = new Sunny.UI.UIRadioButton();
             uiRadioButton1 = new Sunny.UI.UIRadioButton();
             uiPanel3 = new Sunny.UI.UIPanel();
@@ -83,18 +104,20 @@
             用户管理ToolStripMenuItem = new ToolStripMenuItem();
             退出登录ToolStripMenuItem = new ToolStripMenuItem();
             测试ToolStripMenuItem = new ToolStripMenuItem();
-            alignerToolStripMenuItem = new ToolStripMenuItem();
-            alignerToolStripMenuItem1 = new ToolStripMenuItem();
-            lDToolStripMenuItem = new ToolStripMenuItem();
-            p1ToolStripMenuItem = new ToolStripMenuItem();
-            x1ToolStripMenuItem = new ToolStripMenuItem();
-            寻边器ToolStripMenuItem = new ToolStripMenuItem();
             设备信号查看ToolStripMenuItem = new ToolStripMenuItem();
+            雷赛IO卡ToolStripMenuItem = new ToolStripMenuItem();
+            运动控制卡ToolStripMenuItem = new ToolStripMenuItem();
+            axisToolStripMenuItem = new ToolStripMenuItem();
             记录ToolStripMenuItem = new ToolStripMenuItem();
             报警LogToolStripMenuItem = new ToolStripMenuItem();
             日产能ToolStripMenuItem = new ToolStripMenuItem();
             当前登录用户ToolStripMenuItem = new ToolStripMenuItem();
             panel7 = new Panel();
+            panel8 = new Panel();
+            wafer_size = new Label();
+            label6 = new Label();
+            wafer_type = new Label();
+            label4 = new Label();
             label3 = new Label();
             uiLight2 = new Sunny.UI.UILight();
             label2 = new Label();
@@ -116,6 +139,9 @@
             ((System.ComponentModel.ISupportInitialize)dataGridView2).BeginInit();
             panel4.SuspendLayout();
             uiGroupBox5.SuspendLayout();
+            uiGroupBox9.SuspendLayout();
+            uiGroupBox3.SuspendLayout();
+            uiGroupBox2.SuspendLayout();
             uiGroupBox6.SuspendLayout();
             uiGroupBox7.SuspendLayout();
             uiGroupBox8.SuspendLayout();
@@ -127,6 +153,7 @@
             panel5.SuspendLayout();
             menuStrip1.SuspendLayout();
             panel7.SuspendLayout();
+            panel8.SuspendLayout();
             uiFlowLayoutPanel2.SuspendLayout();
             uiGroupBox1.SuspendLayout();
             uiRichTextBox1.SuspendLayout();
@@ -150,7 +177,7 @@
             tabControl1.Controls.Add(tabPage1);
             tabControl1.Controls.Add(tabPage2);
             tabControl1.Dock = DockStyle.Fill;
-            tabControl1.Font = new Font("隶书", 11F);
+            tabControl1.Font = new Font("Microsoft Sans Serif", 11F);
             tabControl1.Location = new Point(206, 76);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
@@ -162,10 +189,10 @@
             tabPage1.Controls.Add(dataGridView1);
             tabPage1.Controls.Add(panel3);
             tabPage1.Controls.Add(uiPanel1);
-            tabPage1.Location = new Point(4, 25);
+            tabPage1.Location = new Point(4, 27);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(1710, 811);
+            tabPage1.Size = new Size(1710, 809);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "自动页面";
             tabPage1.UseVisualStyleBackColor = true;
@@ -174,8 +201,8 @@
             // 
             dataGridView1.AllowUserToAddRows = false;
             dataGridView1.AllowUserToDeleteRows = false;
-            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-            dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            dataGridView1.AllowUserToResizeColumns = false;
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
             dataGridView1.BackgroundColor = Color.White;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridView1.Dock = DockStyle.Fill;
@@ -183,8 +210,7 @@
             dataGridView1.Location = new Point(3, 354);
             dataGridView1.Name = "dataGridView1";
             dataGridView1.ReadOnly = true;
-            dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridView1.Size = new Size(1704, 374);
+            dataGridView1.Size = new Size(1704, 372);
             dataGridView1.TabIndex = 6;
             // 
             // panel3
@@ -192,7 +218,7 @@
             panel3.AutoScroll = true;
             panel3.Controls.Add(uiGroupBox4);
             panel3.Dock = DockStyle.Bottom;
-            panel3.Location = new Point(3, 728);
+            panel3.Location = new Point(3, 726);
             panel3.Margin = new Padding(2);
             panel3.Name = "panel3";
             panel3.Size = new Size(1704, 80);
@@ -200,11 +226,12 @@
             // 
             // uiGroupBox4
             // 
+            uiGroupBox4.Controls.Add(uiButton2);
             uiGroupBox4.Controls.Add(but_readout);
             uiGroupBox4.Controls.Add(but_readin);
             uiGroupBox4.Controls.Add(but_stop);
             uiGroupBox4.Controls.Add(but_uppower);
-            uiGroupBox4.Controls.Add(uiButton6);
+            uiGroupBox4.Controls.Add(but_Reset);
             uiGroupBox4.Dock = DockStyle.Fill;
             uiGroupBox4.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
             uiGroupBox4.Location = new Point(0, 0);
@@ -217,6 +244,18 @@
             uiGroupBox4.Text = "设备控制";
             uiGroupBox4.TextAlignment = ContentAlignment.MiddleLeft;
             // 
+            // uiButton2
+            // 
+            uiButton2.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            uiButton2.Location = new Point(657, 35);
+            uiButton2.MinimumSize = new Size(1, 1);
+            uiButton2.Name = "uiButton2";
+            uiButton2.Size = new Size(104, 34);
+            uiButton2.TabIndex = 25;
+            uiButton2.Text = "拉取数据";
+            uiButton2.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            uiButton2.Click += uiButton2_Click_1;
+            // 
             // but_readout
             // 
             but_readout.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
@@ -225,9 +264,8 @@
             but_readout.Name = "but_readout";
             but_readout.Size = new Size(104, 34);
             but_readout.TabIndex = 24;
-            but_readout.Text = "读取";
+            but_readout.Text = "停止";
             but_readout.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            but_readout.Visible = false;
             but_readout.Click += but_readout_Click;
             // 
             // but_readin
@@ -238,9 +276,8 @@
             but_readin.Name = "but_readin";
             but_readin.Size = new Size(104, 34);
             but_readin.TabIndex = 23;
-            but_readin.Text = "写入";
+            but_readin.Text = "切换模式";
             but_readin.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            but_readin.Visible = false;
             but_readin.Click += but_readin_Click;
             // 
             // but_stop
@@ -273,16 +310,17 @@
             but_uppower.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
             but_uppower.Click += but_uppower_Click;
             // 
-            // uiButton6
+            // but_Reset
             // 
-            uiButton6.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            uiButton6.Location = new Point(137, 35);
-            uiButton6.MinimumSize = new Size(1, 1);
-            uiButton6.Name = "uiButton6";
-            uiButton6.Size = new Size(104, 34);
-            uiButton6.TabIndex = 21;
-            uiButton6.Text = "复位";
-            uiButton6.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_Reset.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_Reset.Location = new Point(137, 35);
+            but_Reset.MinimumSize = new Size(1, 1);
+            but_Reset.Name = "but_Reset";
+            but_Reset.Size = new Size(104, 34);
+            but_Reset.TabIndex = 21;
+            but_Reset.Text = "复位";
+            but_Reset.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_Reset.Click += but_Reset_Click;
             // 
             // uiPanel1
             // 
@@ -304,17 +342,17 @@
             factoryLayoutControl2.Location = new Point(0, 0);
             factoryLayoutControl2.Name = "factoryLayoutControl2";
             factoryLayoutControl2.Size = new Size(1704, 351);
-            factoryLayoutControl2.TabIndex = 0;
+            factoryLayoutControl2.TabIndex = 1;
             // 
             // tabPage2
             // 
             tabPage2.Controls.Add(dataGridView2);
             tabPage2.Controls.Add(panel4);
             tabPage2.Controls.Add(uiPanel3);
-            tabPage2.Location = new Point(4, 25);
+            tabPage2.Location = new Point(4, 27);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(1710, 811);
+            tabPage2.Size = new Size(1710, 809);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "工程师手动页面";
             tabPage2.UseVisualStyleBackColor = true;
@@ -331,18 +369,21 @@
             dataGridView2.Location = new Point(3, 354);
             dataGridView2.Name = "dataGridView2";
             dataGridView2.ReadOnly = true;
-            dataGridView2.Size = new Size(1704, 295);
+            dataGridView2.Size = new Size(1704, 293);
             dataGridView2.TabIndex = 54;
             // 
             // panel4
             // 
             panel4.AutoScroll = true;
             panel4.Controls.Add(uiGroupBox5);
+            panel4.Controls.Add(uiGroupBox9);
+            panel4.Controls.Add(uiGroupBox3);
+            panel4.Controls.Add(uiGroupBox2);
             panel4.Controls.Add(uiGroupBox6);
             panel4.Controls.Add(uiGroupBox7);
             panel4.Controls.Add(uiGroupBox8);
             panel4.Dock = DockStyle.Bottom;
-            panel4.Location = new Point(3, 649);
+            panel4.Location = new Point(3, 647);
             panel4.Margin = new Padding(2);
             panel4.Name = "panel4";
             panel4.Size = new Size(1704, 159);
@@ -350,89 +391,402 @@
             // 
             // uiGroupBox5
             // 
-            uiGroupBox5.Controls.Add(uiButton10);
-            uiGroupBox5.Controls.Add(uiButton11);
-            uiGroupBox5.Controls.Add(uiButton12);
+            uiGroupBox5.Controls.Add(but_GCStop);
+            uiGroupBox5.Controls.Add(but_GCPowered);
+            uiGroupBox5.Controls.Add(but_GCReset);
             uiGroupBox5.Dock = DockStyle.Fill;
             uiGroupBox5.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            uiGroupBox5.Location = new Point(613, 0);
+            uiGroupBox5.Location = new Point(1431, 0);
             uiGroupBox5.Margin = new Padding(4, 5, 4, 5);
             uiGroupBox5.MinimumSize = new Size(1, 1);
             uiGroupBox5.Name = "uiGroupBox5";
             uiGroupBox5.Padding = new Padding(0, 32, 0, 0);
-            uiGroupBox5.Size = new Size(1091, 159);
+            uiGroupBox5.Size = new Size(273, 159);
             uiGroupBox5.TabIndex = 19;
             uiGroupBox5.Text = "设备事项";
             uiGroupBox5.TextAlignment = ContentAlignment.MiddleLeft;
             // 
-            // uiButton10
+            // but_GCStop
             // 
-            uiButton10.FillColor = Color.Red;
-            uiButton10.FillSelectedColor = Color.Red;
-            uiButton10.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            uiButton10.Location = new Point(134, 33);
-            uiButton10.MinimumSize = new Size(1, 1);
-            uiButton10.Name = "uiButton10";
-            uiButton10.RectColor = Color.Red;
-            uiButton10.RectHoverColor = Color.Red;
-            uiButton10.RectPressColor = Color.Red;
-            uiButton10.RectSelectedColor = Color.Red;
-            uiButton10.Size = new Size(100, 35);
-            uiButton10.TabIndex = 22;
-            uiButton10.Text = "急停";
-            uiButton10.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_GCStop.FillColor = Color.Red;
+            but_GCStop.FillSelectedColor = Color.Red;
+            but_GCStop.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_GCStop.Location = new Point(134, 33);
+            but_GCStop.MinimumSize = new Size(1, 1);
+            but_GCStop.Name = "but_GCStop";
+            but_GCStop.RectColor = Color.Red;
+            but_GCStop.RectHoverColor = Color.Red;
+            but_GCStop.RectPressColor = Color.Red;
+            but_GCStop.RectSelectedColor = Color.Red;
+            but_GCStop.Size = new Size(100, 35);
+            but_GCStop.TabIndex = 22;
+            but_GCStop.Text = "急停";
+            but_GCStop.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_GCStop.Click += but_GCStop_Click;
             // 
-            // uiButton11
+            // but_GCPowered
             // 
-            uiButton11.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            uiButton11.Location = new Point(7, 33);
-            uiButton11.MinimumSize = new Size(1, 1);
-            uiButton11.Name = "uiButton11";
-            uiButton11.Size = new Size(100, 35);
-            uiButton11.TabIndex = 20;
-            uiButton11.Text = "上电";
-            uiButton11.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_GCPowered.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_GCPowered.Location = new Point(7, 33);
+            but_GCPowered.MinimumSize = new Size(1, 1);
+            but_GCPowered.Name = "but_GCPowered";
+            but_GCPowered.Size = new Size(100, 35);
+            but_GCPowered.TabIndex = 20;
+            but_GCPowered.Text = "上电";
+            but_GCPowered.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_GCPowered.Click += but_GCPowered_Click;
             // 
-            // uiButton12
+            // but_GCReset
             // 
-            uiButton12.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            uiButton12.Location = new Point(7, 114);
-            uiButton12.MinimumSize = new Size(1, 1);
-            uiButton12.Name = "uiButton12";
-            uiButton12.Size = new Size(100, 35);
-            uiButton12.TabIndex = 21;
-            uiButton12.Text = "复位";
-            uiButton12.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_GCReset.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_GCReset.Location = new Point(7, 114);
+            but_GCReset.MinimumSize = new Size(1, 1);
+            but_GCReset.Name = "but_GCReset";
+            but_GCReset.Size = new Size(100, 35);
+            but_GCReset.TabIndex = 21;
+            but_GCReset.Text = "复位";
+            but_GCReset.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_GCReset.Click += but_GCReset_Click;
+            // 
+            // uiGroupBox9
+            // 
+            uiGroupBox9.Controls.Add(ErrorClear_Axis);
+            uiGroupBox9.Controls.Add(ErrorClear_AngleT);
+            uiGroupBox9.Controls.Add(ErrorClear_Aligner);
+            uiGroupBox9.Controls.Add(ErrorClear_robot);
+            uiGroupBox9.Controls.Add(ErrorClear_lp2);
+            uiGroupBox9.Controls.Add(ErrorClear_lp1);
+            uiGroupBox9.Dock = DockStyle.Left;
+            uiGroupBox9.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            uiGroupBox9.Location = new Point(1146, 0);
+            uiGroupBox9.Margin = new Padding(4, 5, 4, 5);
+            uiGroupBox9.MinimumSize = new Size(1, 1);
+            uiGroupBox9.Name = "uiGroupBox9";
+            uiGroupBox9.Padding = new Padding(0, 32, 0, 0);
+            uiGroupBox9.Size = new Size(285, 159);
+            uiGroupBox9.TabIndex = 22;
+            uiGroupBox9.Text = "设备事项";
+            uiGroupBox9.TextAlignment = ContentAlignment.MiddleLeft;
+            // 
+            // ErrorClear_Axis
+            // 
+            ErrorClear_Axis.FillColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_Axis.FillColor2 = Color.FromArgb(0, 192, 0);
+            ErrorClear_Axis.FillHoverColor = Color.SeaGreen;
+            ErrorClear_Axis.FillPressColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_Axis.FillSelectedColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_Axis.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            ErrorClear_Axis.Location = new Point(152, 114);
+            ErrorClear_Axis.MinimumSize = new Size(1, 1);
+            ErrorClear_Axis.Name = "ErrorClear_Axis";
+            ErrorClear_Axis.RectColor = Color.Lime;
+            ErrorClear_Axis.RectHoverColor = Color.SeaGreen;
+            ErrorClear_Axis.RectPressColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_Axis.RectSelectedColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_Axis.Size = new Size(117, 35);
+            ErrorClear_Axis.TabIndex = 26;
+            ErrorClear_Axis.Text = "轴清除报警";
+            ErrorClear_Axis.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            ErrorClear_Axis.Click += ErrorClear_Axis_Click;
+            // 
+            // ErrorClear_AngleT
+            // 
+            ErrorClear_AngleT.FillColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_AngleT.FillColor2 = Color.FromArgb(0, 192, 0);
+            ErrorClear_AngleT.FillHoverColor = Color.SeaGreen;
+            ErrorClear_AngleT.FillPressColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_AngleT.FillSelectedColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_AngleT.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            ErrorClear_AngleT.Location = new Point(152, 70);
+            ErrorClear_AngleT.MinimumSize = new Size(1, 1);
+            ErrorClear_AngleT.Name = "ErrorClear_AngleT";
+            ErrorClear_AngleT.RectColor = Color.Lime;
+            ErrorClear_AngleT.RectHoverColor = Color.SeaGreen;
+            ErrorClear_AngleT.RectPressColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_AngleT.RectSelectedColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_AngleT.Size = new Size(117, 35);
+            ErrorClear_AngleT.TabIndex = 25;
+            ErrorClear_AngleT.Text = "角度台清除报警";
+            ErrorClear_AngleT.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            ErrorClear_AngleT.Click += ErrorClear_AngleT_Click;
+            // 
+            // ErrorClear_Aligner
+            // 
+            ErrorClear_Aligner.FillColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_Aligner.FillColor2 = Color.Lime;
+            ErrorClear_Aligner.FillHoverColor = Color.SeaGreen;
+            ErrorClear_Aligner.FillPressColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_Aligner.FillSelectedColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_Aligner.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            ErrorClear_Aligner.Location = new Point(152, 30);
+            ErrorClear_Aligner.MinimumSize = new Size(1, 1);
+            ErrorClear_Aligner.Name = "ErrorClear_Aligner";
+            ErrorClear_Aligner.RectColor = Color.Lime;
+            ErrorClear_Aligner.RectHoverColor = Color.SeaGreen;
+            ErrorClear_Aligner.RectPressColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_Aligner.RectSelectedColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_Aligner.Size = new Size(117, 35);
+            ErrorClear_Aligner.TabIndex = 24;
+            ErrorClear_Aligner.Text = "寻边机清除报警";
+            ErrorClear_Aligner.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            ErrorClear_Aligner.Click += ErrorClear_Aligner_Click;
+            // 
+            // ErrorClear_robot
+            // 
+            ErrorClear_robot.FillColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_robot.FillColor2 = Color.FromArgb(0, 192, 0);
+            ErrorClear_robot.FillHoverColor = Color.SeaGreen;
+            ErrorClear_robot.FillPressColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_robot.FillSelectedColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_robot.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            ErrorClear_robot.Location = new Point(16, 114);
+            ErrorClear_robot.MinimumSize = new Size(1, 1);
+            ErrorClear_robot.Name = "ErrorClear_robot";
+            ErrorClear_robot.RectColor = Color.Lime;
+            ErrorClear_robot.RectHoverColor = Color.SeaGreen;
+            ErrorClear_robot.RectPressColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_robot.RectSelectedColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_robot.Size = new Size(117, 35);
+            ErrorClear_robot.TabIndex = 23;
+            ErrorClear_robot.Text = "Robot清除报警";
+            ErrorClear_robot.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            ErrorClear_robot.Click += ErrorClear_robot_Click;
+            // 
+            // ErrorClear_lp2
+            // 
+            ErrorClear_lp2.FillColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_lp2.FillColor2 = Color.FromArgb(0, 192, 0);
+            ErrorClear_lp2.FillHoverColor = Color.SeaGreen;
+            ErrorClear_lp2.FillPressColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_lp2.FillSelectedColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_lp2.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            ErrorClear_lp2.Location = new Point(16, 71);
+            ErrorClear_lp2.MinimumSize = new Size(1, 1);
+            ErrorClear_lp2.Name = "ErrorClear_lp2";
+            ErrorClear_lp2.RectColor = Color.Lime;
+            ErrorClear_lp2.RectHoverColor = Color.SeaGreen;
+            ErrorClear_lp2.RectPressColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_lp2.RectSelectedColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_lp2.Size = new Size(117, 35);
+            ErrorClear_lp2.TabIndex = 22;
+            ErrorClear_lp2.Text = "LP2清除报警";
+            ErrorClear_lp2.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            ErrorClear_lp2.Click += ErrorClear_lp2_Click;
+            // 
+            // ErrorClear_lp1
+            // 
+            ErrorClear_lp1.FillColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_lp1.FillColor2 = Color.FromArgb(0, 192, 0);
+            ErrorClear_lp1.FillHoverColor = Color.SeaGreen;
+            ErrorClear_lp1.FillPressColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_lp1.FillSelectedColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_lp1.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            ErrorClear_lp1.Location = new Point(16, 30);
+            ErrorClear_lp1.MinimumSize = new Size(1, 1);
+            ErrorClear_lp1.Name = "ErrorClear_lp1";
+            ErrorClear_lp1.RectColor = Color.Lime;
+            ErrorClear_lp1.RectHoverColor = Color.SeaGreen;
+            ErrorClear_lp1.RectPressColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_lp1.RectSelectedColor = Color.FromArgb(0, 192, 0);
+            ErrorClear_lp1.Size = new Size(117, 35);
+            ErrorClear_lp1.TabIndex = 21;
+            ErrorClear_lp1.Text = "LP1清除报警";
+            ErrorClear_lp1.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            ErrorClear_lp1.Click += ErrorClear_lp1_Click;
+            // 
+            // uiGroupBox3
+            // 
+            uiGroupBox3.Controls.Add(but_OCRTirg);
+            uiGroupBox3.Controls.Add(but_OCRStatue);
+            uiGroupBox3.Controls.Add(uiLabel3);
+            uiGroupBox3.Controls.Add(txt_WaferID);
+            uiGroupBox3.Controls.Add(cbx_OCR);
+            uiGroupBox3.Dock = DockStyle.Left;
+            uiGroupBox3.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            uiGroupBox3.Location = new Point(889, 0);
+            uiGroupBox3.Margin = new Padding(4, 5, 4, 5);
+            uiGroupBox3.MinimumSize = new Size(1, 1);
+            uiGroupBox3.Name = "uiGroupBox3";
+            uiGroupBox3.Padding = new Padding(0, 32, 0, 0);
+            uiGroupBox3.Size = new Size(257, 159);
+            uiGroupBox3.TabIndex = 21;
+            uiGroupBox3.Text = "扫片";
+            uiGroupBox3.TextAlignment = ContentAlignment.MiddleLeft;
+            // 
+            // but_OCRTirg
+            // 
+            but_OCRTirg.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_OCRTirg.Location = new Point(159, 114);
+            but_OCRTirg.MinimumSize = new Size(1, 1);
+            but_OCRTirg.Name = "but_OCRTirg";
+            but_OCRTirg.Size = new Size(94, 35);
+            but_OCRTirg.TabIndex = 27;
+            but_OCRTirg.Text = "读取Code";
+            but_OCRTirg.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_OCRTirg.Click += but_OCRTirg_Click;
+            // 
+            // but_OCRStatue
+            // 
+            but_OCRStatue.BackColor = Color.Gold;
+            but_OCRStatue.Enabled = false;
+            but_OCRStatue.FlatStyle = FlatStyle.Flat;
+            but_OCRStatue.Font = new Font("宋体", 14F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_OCRStatue.Location = new Point(51, 120);
+            but_OCRStatue.Name = "but_OCRStatue";
+            but_OCRStatue.Size = new Size(88, 29);
+            but_OCRStatue.TabIndex = 26;
+            but_OCRStatue.Text = "Rdy";
+            but_OCRStatue.UseVisualStyleBackColor = false;
+            // 
+            // uiLabel3
+            // 
+            uiLabel3.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            uiLabel3.ForeColor = Color.FromArgb(48, 48, 48);
+            uiLabel3.Location = new Point(8, 127);
+            uiLabel3.Name = "uiLabel3";
+            uiLabel3.Size = new Size(48, 22);
+            uiLabel3.TabIndex = 25;
+            uiLabel3.Text = "状态:";
+            // 
+            // txt_WaferID
+            // 
+            txt_WaferID.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            txt_WaferID.Location = new Point(8, 76);
+            txt_WaferID.Margin = new Padding(4, 5, 4, 5);
+            txt_WaferID.MinimumSize = new Size(1, 16);
+            txt_WaferID.Name = "txt_WaferID";
+            txt_WaferID.Padding = new Padding(5);
+            txt_WaferID.ShowText = false;
+            txt_WaferID.Size = new Size(245, 29);
+            txt_WaferID.TabIndex = 24;
+            txt_WaferID.TextAlignment = ContentAlignment.MiddleCenter;
+            txt_WaferID.Watermark = "WaferID";
+            txt_WaferID.WatermarkActiveColor = Color.IndianRed;
+            txt_WaferID.WatermarkColor = Color.IndianRed;
+            // 
+            // cbx_OCR
+            // 
+            cbx_OCR.DataSource = null;
+            cbx_OCR.FillColor = Color.White;
+            cbx_OCR.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            cbx_OCR.ItemHoverColor = Color.FromArgb(155, 200, 255);
+            cbx_OCR.Items.AddRange(new object[] { "Aligner", "AngleT" });
+            cbx_OCR.ItemSelectForeColor = Color.FromArgb(235, 243, 255);
+            cbx_OCR.Location = new Point(64, 30);
+            cbx_OCR.Margin = new Padding(4, 5, 4, 5);
+            cbx_OCR.MinimumSize = new Size(63, 0);
+            cbx_OCR.Name = "cbx_OCR";
+            cbx_OCR.Padding = new Padding(0, 0, 30, 2);
+            cbx_OCR.Size = new Size(130, 29);
+            cbx_OCR.SymbolSize = 24;
+            cbx_OCR.TabIndex = 23;
+            cbx_OCR.Text = "设备选择";
+            cbx_OCR.TextAlignment = ContentAlignment.MiddleCenter;
+            cbx_OCR.Watermark = "";
+            // 
+            // uiGroupBox2
+            // 
+            uiGroupBox2.Controls.Add(but_BAL);
+            uiGroupBox2.Controls.Add(but_MTM);
+            uiGroupBox2.Controls.Add(cbx_Aligner);
+            uiGroupBox2.Dock = DockStyle.Left;
+            uiGroupBox2.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            uiGroupBox2.Location = new Point(743, 0);
+            uiGroupBox2.Margin = new Padding(4, 5, 4, 5);
+            uiGroupBox2.MinimumSize = new Size(1, 1);
+            uiGroupBox2.Name = "uiGroupBox2";
+            uiGroupBox2.Padding = new Padding(0, 32, 0, 0);
+            uiGroupBox2.Size = new Size(146, 159);
+            uiGroupBox2.TabIndex = 20;
+            uiGroupBox2.Text = "Aligner/AngleT";
+            uiGroupBox2.TextAlignment = ContentAlignment.MiddleLeft;
+            // 
+            // but_BAL
+            // 
+            but_BAL.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_BAL.Location = new Point(8, 114);
+            but_BAL.MinimumSize = new Size(1, 1);
+            but_BAL.Name = "but_BAL";
+            but_BAL.Size = new Size(130, 35);
+            but_BAL.TabIndex = 24;
+            but_BAL.Text = "寻边";
+            but_BAL.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_BAL.Click += but_BAL_Click;
+            // 
+            // but_MTM
+            // 
+            but_MTM.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_MTM.Location = new Point(8, 70);
+            but_MTM.MinimumSize = new Size(1, 1);
+            but_MTM.Name = "but_MTM";
+            but_MTM.Size = new Size(130, 35);
+            but_MTM.TabIndex = 23;
+            but_MTM.Text = "移动至中心";
+            but_MTM.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_MTM.Click += but_MTM_Click;
+            // 
+            // cbx_Aligner
+            // 
+            cbx_Aligner.DataSource = null;
+            cbx_Aligner.FillColor = Color.White;
+            cbx_Aligner.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            cbx_Aligner.ItemHoverColor = Color.FromArgb(155, 200, 255);
+            cbx_Aligner.Items.AddRange(new object[] { "Aligner", "AngleT" });
+            cbx_Aligner.ItemSelectForeColor = Color.FromArgb(235, 243, 255);
+            cbx_Aligner.Location = new Point(8, 30);
+            cbx_Aligner.Margin = new Padding(4, 5, 4, 5);
+            cbx_Aligner.MinimumSize = new Size(63, 0);
+            cbx_Aligner.Name = "cbx_Aligner";
+            cbx_Aligner.Padding = new Padding(0, 0, 30, 2);
+            cbx_Aligner.Size = new Size(130, 29);
+            cbx_Aligner.SymbolSize = 24;
+            cbx_Aligner.TabIndex = 22;
+            cbx_Aligner.TextAlignment = ContentAlignment.MiddleCenter;
+            cbx_Aligner.Watermark = "";
             // 
             // uiGroupBox6
             // 
-            uiGroupBox6.Controls.Add(uiButton4);
-            uiGroupBox6.Controls.Add(cbx_Slot);
+            uiGroupBox6.Controls.Add(but_movePUT);
             uiGroupBox6.Controls.Add(but_orientation_up);
+            uiGroupBox6.Controls.Add(cbx_Slot);
+            uiGroupBox6.Controls.Add(but_moveGET);
             uiGroupBox6.Controls.Add(but_orientation_dow);
             uiGroupBox6.Controls.Add(CbxFacility);
             uiGroupBox6.Dock = DockStyle.Left;
             uiGroupBox6.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            uiGroupBox6.Location = new Point(356, 0);
+            uiGroupBox6.Location = new Point(460, 0);
             uiGroupBox6.Margin = new Padding(4, 5, 4, 5);
             uiGroupBox6.MinimumSize = new Size(1, 1);
             uiGroupBox6.Name = "uiGroupBox6";
             uiGroupBox6.Padding = new Padding(0, 32, 0, 0);
-            uiGroupBox6.Size = new Size(257, 159);
+            uiGroupBox6.Size = new Size(283, 159);
             uiGroupBox6.TabIndex = 18;
             uiGroupBox6.Text = "Robot动作";
             uiGroupBox6.TextAlignment = ContentAlignment.MiddleLeft;
             // 
-            // uiButton4
+            // but_movePUT
             // 
-            uiButton4.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            uiButton4.Location = new Point(145, 72);
-            uiButton4.MinimumSize = new Size(1, 1);
-            uiButton4.Name = "uiButton4";
-            uiButton4.Size = new Size(100, 32);
-            uiButton4.TabIndex = 26;
-            uiButton4.Text = "单步放片";
-            uiButton4.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_movePUT.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_movePUT.Location = new Point(146, 71);
+            but_movePUT.MinimumSize = new Size(1, 1);
+            but_movePUT.Name = "but_movePUT";
+            but_movePUT.Size = new Size(130, 35);
+            but_movePUT.TabIndex = 27;
+            but_movePUT.Text = "移动至放片位置";
+            but_movePUT.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_movePUT.Click += but_moveput_Click;
+            // 
+            // but_orientation_up
+            // 
+            but_orientation_up.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_orientation_up.Location = new Point(146, 118);
+            but_orientation_up.MinimumSize = new Size(1, 1);
+            but_orientation_up.Name = "but_orientation_up";
+            but_orientation_up.Size = new Size(130, 32);
+            but_orientation_up.TabIndex = 26;
+            but_orientation_up.Text = "单步放片";
+            but_orientation_up.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_orientation_up.Click += but_orientation_up_Click;
             // 
             // cbx_Slot
             // 
@@ -440,9 +794,9 @@
             cbx_Slot.FillColor = Color.White;
             cbx_Slot.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
             cbx_Slot.ItemHoverColor = Color.FromArgb(155, 200, 255);
-            cbx_Slot.Items.AddRange(new object[] { "A1", "A2", "A3", "A4", "C1", "G1", "R1", "M1", "U1", "V1", "S1", "S2", "S3", "角度台" });
+            cbx_Slot.Items.AddRange(new object[] { "UP", "DOWN" });
             cbx_Slot.ItemSelectForeColor = Color.FromArgb(235, 243, 255);
-            cbx_Slot.Location = new Point(8, 74);
+            cbx_Slot.Location = new Point(146, 30);
             cbx_Slot.Margin = new Padding(4, 5, 4, 5);
             cbx_Slot.MinimumSize = new Size(63, 0);
             cbx_Slot.Name = "cbx_Slot";
@@ -454,25 +808,25 @@
             cbx_Slot.TextAlignment = ContentAlignment.MiddleCenter;
             cbx_Slot.Watermark = "";
             // 
-            // but_orientation_up
+            // but_moveGET
             // 
-            but_orientation_up.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            but_orientation_up.Location = new Point(8, 114);
-            but_orientation_up.MinimumSize = new Size(1, 1);
-            but_orientation_up.Name = "but_orientation_up";
-            but_orientation_up.Size = new Size(130, 35);
-            but_orientation_up.TabIndex = 24;
-            but_orientation_up.Text = "移动至指定位置";
-            but_orientation_up.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            but_orientation_up.Click += but_orientation_up_Click;
+            but_moveGET.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_moveGET.Location = new Point(8, 71);
+            but_moveGET.MinimumSize = new Size(1, 1);
+            but_moveGET.Name = "but_moveGET";
+            but_moveGET.Size = new Size(130, 35);
+            but_moveGET.TabIndex = 24;
+            but_moveGET.Text = "移动至取片位置";
+            but_moveGET.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_moveGET.Click += but_moveget_Click;
             // 
             // but_orientation_dow
             // 
             but_orientation_dow.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            but_orientation_dow.Location = new Point(145, 27);
+            but_orientation_dow.Location = new Point(8, 118);
             but_orientation_dow.MinimumSize = new Size(1, 1);
             but_orientation_dow.Name = "but_orientation_dow";
-            but_orientation_dow.Size = new Size(100, 32);
+            but_orientation_dow.Size = new Size(130, 32);
             but_orientation_dow.TabIndex = 23;
             but_orientation_dow.Text = "单步取片";
             but_orientation_dow.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
@@ -507,7 +861,7 @@
             uiGroupBox7.Controls.Add(uiLabel1);
             uiGroupBox7.Dock = DockStyle.Left;
             uiGroupBox7.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            uiGroupBox7.Location = new Point(177, 0);
+            uiGroupBox7.Location = new Point(281, 0);
             uiGroupBox7.Margin = new Padding(4, 5, 4, 5);
             uiGroupBox7.MinimumSize = new Size(1, 1);
             uiGroupBox7.Name = "uiGroupBox7";
@@ -574,8 +928,10 @@
             // 
             // uiGroupBox8
             // 
-            uiGroupBox8.Controls.Add(uiButton3);
-            uiGroupBox8.Controls.Add(uiButton2);
+            uiGroupBox8.Controls.Add(but_MapLoad);
+            uiGroupBox8.Controls.Add(but_MapUnLoad);
+            uiGroupBox8.Controls.Add(but_UnLoad);
+            uiGroupBox8.Controls.Add(but_Load);
             uiGroupBox8.Controls.Add(uiRadioButton2);
             uiGroupBox8.Controls.Add(uiRadioButton1);
             uiGroupBox8.Dock = DockStyle.Left;
@@ -585,37 +941,63 @@
             uiGroupBox8.MinimumSize = new Size(1, 1);
             uiGroupBox8.Name = "uiGroupBox8";
             uiGroupBox8.Padding = new Padding(0, 32, 0, 0);
-            uiGroupBox8.Size = new Size(177, 159);
+            uiGroupBox8.Size = new Size(281, 159);
             uiGroupBox8.TabIndex = 16;
             uiGroupBox8.Text = "LoadPort";
             uiGroupBox8.TextAlignment = ContentAlignment.MiddleLeft;
             // 
-            // uiButton3
+            // but_MapLoad
             // 
-            uiButton3.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            uiButton3.Location = new Point(91, 114);
-            uiButton3.MinimumSize = new Size(1, 1);
-            uiButton3.Name = "uiButton3";
-            uiButton3.Size = new Size(64, 35);
-            uiButton3.TabIndex = 3;
-            uiButton3.Text = "UnLoad";
-            uiButton3.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_MapLoad.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_MapLoad.Location = new Point(15, 114);
+            but_MapLoad.MinimumSize = new Size(1, 1);
+            but_MapLoad.Name = "but_MapLoad";
+            but_MapLoad.Size = new Size(111, 35);
+            but_MapLoad.TabIndex = 5;
+            but_MapLoad.Text = "MapLoad";
+            but_MapLoad.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_MapLoad.Click += but_MapLoad_Click;
             // 
-            // uiButton2
+            // but_MapUnLoad
             // 
-            uiButton2.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            uiButton2.Location = new Point(15, 114);
-            uiButton2.MinimumSize = new Size(1, 1);
-            uiButton2.Name = "uiButton2";
-            uiButton2.Size = new Size(64, 35);
-            uiButton2.TabIndex = 2;
-            uiButton2.Text = "Load";
-            uiButton2.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_MapUnLoad.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_MapUnLoad.Location = new Point(154, 114);
+            but_MapUnLoad.MinimumSize = new Size(1, 1);
+            but_MapUnLoad.Name = "but_MapUnLoad";
+            but_MapUnLoad.Size = new Size(111, 35);
+            but_MapUnLoad.TabIndex = 4;
+            but_MapUnLoad.Text = "MapUnLoad";
+            but_MapUnLoad.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_MapUnLoad.Click += but_MapUnLoad_Click;
+            // 
+            // but_UnLoad
+            // 
+            but_UnLoad.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_UnLoad.Location = new Point(154, 68);
+            but_UnLoad.MinimumSize = new Size(1, 1);
+            but_UnLoad.Name = "but_UnLoad";
+            but_UnLoad.Size = new Size(111, 35);
+            but_UnLoad.TabIndex = 3;
+            but_UnLoad.Text = "UnLoad";
+            but_UnLoad.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_UnLoad.Click += uiButton3_Click;
+            // 
+            // but_Load
+            // 
+            but_Load.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_Load.Location = new Point(15, 70);
+            but_Load.MinimumSize = new Size(1, 1);
+            but_Load.Name = "but_Load";
+            but_Load.Size = new Size(111, 35);
+            but_Load.TabIndex = 2;
+            but_Load.Text = "Load";
+            but_Load.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            but_Load.Click += uiButton2_Click;
             // 
             // uiRadioButton2
             // 
             uiRadioButton2.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            uiRadioButton2.Location = new Point(31, 72);
+            uiRadioButton2.Location = new Point(154, 35);
             uiRadioButton2.MinimumSize = new Size(1, 1);
             uiRadioButton2.Name = "uiRadioButton2";
             uiRadioButton2.Size = new Size(111, 29);
@@ -624,8 +1006,9 @@
             // 
             // uiRadioButton1
             // 
+            uiRadioButton1.Checked = true;
             uiRadioButton1.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            uiRadioButton1.Location = new Point(31, 37);
+            uiRadioButton1.Location = new Point(15, 35);
             uiRadioButton1.MinimumSize = new Size(1, 1);
             uiRadioButton1.Name = "uiRadioButton1";
             uiRadioButton1.Size = new Size(111, 29);
@@ -745,7 +1128,7 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { 设置ToolStripMenuItem, 测试ToolStripMenuItem, 记录ToolStripMenuItem, 当前登录用户ToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(1619, 31);
+            menuStrip1.Size = new Size(1390, 31);
             menuStrip1.TabIndex = 5;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -786,46 +1169,10 @@
             // 
             // 测试ToolStripMenuItem
             // 
-            测试ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { alignerToolStripMenuItem, alignerToolStripMenuItem1, lDToolStripMenuItem, p1ToolStripMenuItem, x1ToolStripMenuItem, 寻边器ToolStripMenuItem, 设备信号查看ToolStripMenuItem });
+            测试ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { 设备信号查看ToolStripMenuItem, 雷赛IO卡ToolStripMenuItem, 运动控制卡ToolStripMenuItem, axisToolStripMenuItem });
             测试ToolStripMenuItem.Name = "测试ToolStripMenuItem";
             测试ToolStripMenuItem.Size = new Size(53, 27);
             测试ToolStripMenuItem.Text = "测试";
-            // 
-            // alignerToolStripMenuItem
-            // 
-            alignerToolStripMenuItem.Name = "alignerToolStripMenuItem";
-            alignerToolStripMenuItem.Size = new Size(176, 22);
-            alignerToolStripMenuItem.Text = "Aligner";
-            // 
-            // alignerToolStripMenuItem1
-            // 
-            alignerToolStripMenuItem1.Name = "alignerToolStripMenuItem1";
-            alignerToolStripMenuItem1.Size = new Size(176, 22);
-            alignerToolStripMenuItem1.Text = "角度台";
-            // 
-            // lDToolStripMenuItem
-            // 
-            lDToolStripMenuItem.Name = "lDToolStripMenuItem";
-            lDToolStripMenuItem.Size = new Size(176, 22);
-            lDToolStripMenuItem.Text = "LD";
-            // 
-            // p1ToolStripMenuItem
-            // 
-            p1ToolStripMenuItem.Name = "p1ToolStripMenuItem";
-            p1ToolStripMenuItem.Size = new Size(176, 22);
-            p1ToolStripMenuItem.Text = "P1";
-            // 
-            // x1ToolStripMenuItem
-            // 
-            x1ToolStripMenuItem.Name = "x1ToolStripMenuItem";
-            x1ToolStripMenuItem.Size = new Size(176, 22);
-            x1ToolStripMenuItem.Text = "X1";
-            // 
-            // 寻边器ToolStripMenuItem
-            // 
-            寻边器ToolStripMenuItem.Name = "寻边器ToolStripMenuItem";
-            寻边器ToolStripMenuItem.Size = new Size(176, 22);
-            寻边器ToolStripMenuItem.Text = "寻边器";
             // 
             // 设备信号查看ToolStripMenuItem
             // 
@@ -833,6 +1180,27 @@
             设备信号查看ToolStripMenuItem.Size = new Size(176, 22);
             设备信号查看ToolStripMenuItem.Text = "设备信号查看";
             设备信号查看ToolStripMenuItem.Click += 设备信号查看ToolStripMenuItem_Click;
+            // 
+            // 雷赛IO卡ToolStripMenuItem
+            // 
+            雷赛IO卡ToolStripMenuItem.Name = "雷赛IO卡ToolStripMenuItem";
+            雷赛IO卡ToolStripMenuItem.Size = new Size(176, 22);
+            雷赛IO卡ToolStripMenuItem.Text = "雷赛IO卡";
+            雷赛IO卡ToolStripMenuItem.Click += 雷赛IO卡ToolStripMenuItem_Click;
+            // 
+            // 运动控制卡ToolStripMenuItem
+            // 
+            运动控制卡ToolStripMenuItem.Name = "运动控制卡ToolStripMenuItem";
+            运动控制卡ToolStripMenuItem.Size = new Size(176, 22);
+            运动控制卡ToolStripMenuItem.Text = "运动控制卡";
+            运动控制卡ToolStripMenuItem.Click += 运动控制卡ToolStripMenuItem_Click;
+            // 
+            // axisToolStripMenuItem
+            // 
+            axisToolStripMenuItem.Name = "axisToolStripMenuItem";
+            axisToolStripMenuItem.Size = new Size(176, 22);
+            axisToolStripMenuItem.Text = "Axis轴";
+            axisToolStripMenuItem.Click += axisToolStripMenuItem_Click;
             // 
             // 记录ToolStripMenuItem
             // 
@@ -865,15 +1233,81 @@
             // panel7
             // 
             panel7.BackColor = Color.FromArgb(192, 255, 255);
+            panel7.Controls.Add(panel8);
             panel7.Controls.Add(label3);
             panel7.Controls.Add(uiLight2);
             panel7.Controls.Add(label2);
             panel7.Controls.Add(uiLight1);
             panel7.Dock = DockStyle.Right;
-            panel7.Location = new Point(1619, 0);
+            panel7.Location = new Point(1390, 0);
             panel7.Name = "panel7";
-            panel7.Size = new Size(305, 31);
+            panel7.Size = new Size(534, 31);
             panel7.TabIndex = 6;
+            // 
+            // panel8
+            // 
+            panel8.Controls.Add(wafer_size);
+            panel8.Controls.Add(label6);
+            panel8.Controls.Add(wafer_type);
+            panel8.Controls.Add(label4);
+            panel8.Dock = DockStyle.Left;
+            panel8.Location = new Point(0, 0);
+            panel8.Name = "panel8";
+            panel8.Size = new Size(238, 31);
+            panel8.TabIndex = 4;
+            panel8.Click += panel8_Click;
+            // 
+            // wafer_size
+            // 
+            wafer_size.Anchor = AnchorStyles.Right;
+            wafer_size.AutoSize = true;
+            wafer_size.Font = new Font("楷体", 12F, FontStyle.Bold);
+            wafer_size.ForeColor = Color.Green;
+            wafer_size.Location = new Point(178, 7);
+            wafer_size.Name = "wafer_size";
+            wafer_size.Size = new Size(50, 16);
+            wafer_size.TabIndex = 11;
+            wafer_size.Text = "8英寸";
+            wafer_size.Click += panel8_Click;
+            // 
+            // label6
+            // 
+            label6.Anchor = AnchorStyles.Right;
+            label6.AutoSize = true;
+            label6.Font = new Font("楷体", 12F, FontStyle.Bold);
+            label6.ForeColor = Color.Green;
+            label6.Location = new Point(158, 7);
+            label6.Name = "label6";
+            label6.Size = new Size(16, 16);
+            label6.TabIndex = 10;
+            label6.Text = "-";
+            label6.Click += panel8_Click;
+            // 
+            // wafer_type
+            // 
+            wafer_type.Anchor = AnchorStyles.Right;
+            wafer_type.AutoSize = true;
+            wafer_type.Font = new Font("楷体", 12F, FontStyle.Bold);
+            wafer_type.ForeColor = Color.Green;
+            wafer_type.Location = new Point(100, 7);
+            wafer_type.Name = "wafer_type";
+            wafer_type.Size = new Size(52, 16);
+            wafer_type.TabIndex = 9;
+            wafer_type.Text = "Wafer";
+            wafer_type.Click += panel8_Click;
+            // 
+            // label4
+            // 
+            label4.Anchor = AnchorStyles.Right;
+            label4.AutoSize = true;
+            label4.Font = new Font("楷体", 12F, FontStyle.Bold);
+            label4.ForeColor = Color.Green;
+            label4.Location = new Point(4, 7);
+            label4.Name = "label4";
+            label4.Size = new Size(103, 16);
+            label4.TabIndex = 8;
+            label4.Text = "Wafer模式：";
+            label4.Click += panel8_Click;
             // 
             // label3
             // 
@@ -881,7 +1315,7 @@
             label3.AutoSize = true;
             label3.Font = new Font("楷体", 12F, FontStyle.Bold);
             label3.ForeColor = Color.Green;
-            label3.Location = new Point(7, 7);
+            label3.Location = new Point(236, 7);
             label3.Name = "label3";
             label3.Size = new Size(106, 16);
             label3.TabIndex = 3;
@@ -891,7 +1325,7 @@
             // 
             uiLight2.Anchor = AnchorStyles.Right;
             uiLight2.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            uiLight2.Location = new Point(112, 0);
+            uiLight2.Location = new Point(341, 0);
             uiLight2.MinimumSize = new Size(1, 1);
             uiLight2.Name = "uiLight2";
             uiLight2.OffColor = Color.Red;
@@ -907,7 +1341,7 @@
             label2.AutoSize = true;
             label2.Font = new Font("楷体", 12F, FontStyle.Bold);
             label2.ForeColor = Color.Green;
-            label2.Location = new Point(143, 7);
+            label2.Location = new Point(372, 7);
             label2.Name = "label2";
             label2.Size = new Size(124, 16);
             label2.TabIndex = 1;
@@ -917,7 +1351,7 @@
             // 
             uiLight1.Anchor = AnchorStyles.Right;
             uiLight1.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            uiLight1.Location = new Point(266, 0);
+            uiLight1.Location = new Point(495, 0);
             uiLight1.MinimumSize = new Size(1, 1);
             uiLight1.Name = "uiLight1";
             uiLight1.OffColor = Color.Red;
@@ -1035,6 +1469,9 @@
             ((System.ComponentModel.ISupportInitialize)dataGridView2).EndInit();
             panel4.ResumeLayout(false);
             uiGroupBox5.ResumeLayout(false);
+            uiGroupBox9.ResumeLayout(false);
+            uiGroupBox3.ResumeLayout(false);
+            uiGroupBox2.ResumeLayout(false);
             uiGroupBox6.ResumeLayout(false);
             uiGroupBox7.ResumeLayout(false);
             uiGroupBox8.ResumeLayout(false);
@@ -1049,6 +1486,8 @@
             menuStrip1.PerformLayout();
             panel7.ResumeLayout(false);
             panel7.PerformLayout();
+            panel8.ResumeLayout(false);
+            panel8.PerformLayout();
             uiFlowLayoutPanel2.ResumeLayout(false);
             uiGroupBox1.ResumeLayout(false);
             uiRichTextBox1.ResumeLayout(false);
@@ -1069,20 +1508,19 @@
         private Sunny.UI.UIGroupBox uiGroupBox4;
         private Sunny.UI.UIButton but_stop;
         private Sunny.UI.UIButton but_uppower;
-        private Sunny.UI.UIButton uiButton6;
+        private Sunny.UI.UIButton but_Reset;
         private Sunny.UI.UIPanel uiPanel3;
         private Panel panel4;
         private Sunny.UI.UIGroupBox uiGroupBox5;
-        private Sunny.UI.UIButton uiButton10;
-        private Sunny.UI.UIButton uiButton11;
-        private Sunny.UI.UIButton uiButton12;
+        private Sunny.UI.UIButton but_GCStop;
+        private Sunny.UI.UIButton but_GCPowered;
+        private Sunny.UI.UIButton but_GCReset;
         private Sunny.UI.UIGroupBox uiGroupBox6;
-        private Sunny.UI.UIButton but_orientation_up;
+        private Sunny.UI.UIButton but_moveGET;
         private Sunny.UI.UIButton but_orientation_dow;
         private Sunny.UI.UIComboBox CbxFacility;
         private Sunny.UI.UIGroupBox uiGroupBox7;
         private Sunny.UI.UIGroupBox uiGroupBox8;
-        private UserControl.FactoryLayoutControl factoryLayoutControl1;
         private Panel panel5;
         private Panel panel6;
         private MenuStrip menuStrip1;
@@ -1090,12 +1528,6 @@
         private ToolStripMenuItem 设备定位ToolStripMenuItem;
         private ToolStripMenuItem 当前流程ToolStripMenuItem;
         private ToolStripMenuItem 测试ToolStripMenuItem;
-        private ToolStripMenuItem alignerToolStripMenuItem;
-        private ToolStripMenuItem alignerToolStripMenuItem1;
-        private ToolStripMenuItem lDToolStripMenuItem;
-        private ToolStripMenuItem p1ToolStripMenuItem;
-        private ToolStripMenuItem x1ToolStripMenuItem;
-        private ToolStripMenuItem 寻边器ToolStripMenuItem;
         private ToolStripMenuItem 记录ToolStripMenuItem;
         private ToolStripMenuItem 报警LogToolStripMenuItem;
         private ToolStripMenuItem 日产能ToolStripMenuItem;
@@ -1113,15 +1545,12 @@
         private Sunny.UI.UIButton uiButton1;
         private Sunny.UI.UIRadioButton uiRadioButton2;
         private Sunny.UI.UIRadioButton uiRadioButton1;
-        private Sunny.UI.UIButton uiButton3;
-        private Sunny.UI.UIButton uiButton2;
+        private Sunny.UI.UIButton but_UnLoad;
+        private Sunny.UI.UIButton but_Load;
         private Sunny.UI.UILabel uiLabel1;
         private Sunny.UI.UILabel uiLabel2;
         private Sunny.UI.UITextBox uiTextBox1;
         private Sunny.UI.UIComboBox uiComboBox1;
-        private UserControl.FactoryLayoutControl factoryLayoutControl2;
-        private UserControl.LoadPort2 loadPort22;
-        private UserControl.LoadPort2 loadPort21;
         private Sunny.UI.UIComboBox cbx_Slot;
         private DataGridView dataGridView1;
         private DataGridView dataGridView2;
@@ -1131,6 +1560,40 @@
         private Label label2;
         private Label label3;
         private Sunny.UI.UILight uiLight2;
-        private Sunny.UI.UIButton uiButton4;
+        private Sunny.UI.UIButton but_orientation_up;
+        private Sunny.UI.UIButton but_MapLoad;
+        private Sunny.UI.UIButton but_MapUnLoad;
+        private Sunny.UI.UIGroupBox uiGroupBox2;
+        private Sunny.UI.UIComboBox cbx_Aligner;
+        private Sunny.UI.UIButton but_BAL;
+        private Sunny.UI.UIButton but_MTM;
+        private Sunny.UI.UIGroupBox uiGroupBox3;
+        private Sunny.UI.UIComboBox cbx_OCR;
+        private Sunny.UI.UILabel uiLabel3;
+        private Button button1;
+        private Sunny.UI.UIButton but_OCRTirg;
+        public UserControl.LoadPort2 loadPort21;
+        public UserControl.LoadPort2 loadPort22;
+        public Button but_OCRStatue;
+        private Sunny.UI.UIButton uiButton2;
+        private Panel panel8;
+        private Label label6;
+        private Label label4;
+        public Label wafer_size;
+        public Label wafer_type;
+        private ToolStripMenuItem 雷赛IO卡ToolStripMenuItem;
+        private ToolStripMenuItem 运动控制卡ToolStripMenuItem;
+        public Sunny.UI.UITextBox txt_WaferID;
+        public UserControl.FactoryLayoutControl factoryLayoutControl1;
+        public UserControl.FactoryLayoutControl factoryLayoutControl2;
+        private ToolStripMenuItem axisToolStripMenuItem;
+        private Sunny.UI.UIGroupBox uiGroupBox9;
+        private Sunny.UI.UIButton ErrorClear_lp1;
+        private Sunny.UI.UIButton ErrorClear_lp2;
+        private Sunny.UI.UIButton ErrorClear_robot;
+        private Sunny.UI.UIButton ErrorClear_Aligner;
+        private Sunny.UI.UIButton ErrorClear_AngleT;
+        private Sunny.UI.UIButton ErrorClear_Axis;
+        private Sunny.UI.UIButton but_movePUT;
     }
 }

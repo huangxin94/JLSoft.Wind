@@ -1,14 +1,18 @@
 using System;
+using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
+using DuckDB.NET.Data;
 using JLSoft.Wind.Class.Models;
 using JLSoft.Wind.Database.DB;
 using JLSoft.Wind.Database.Models;
 using JLSoft.Wind.Database.Struct;
 using JLSoft.Wind.Logs;
 using JLSoft.Wind.Services.Connect;
+using JLSoft.Wind.Services.DuckDb;
 using JLSoft.Wind.Services.Status;
 using Sunny.UI;
+using static JLSoft.Wind.Database.StationName;
 
 namespace JLSoft.Wind.Services
 {
@@ -22,14 +26,19 @@ namespace JLSoft.Wind.Services
         private readonly DeviceMonitor _deviceMonitor;
         private readonly string _slot;
         private readonly Positions _coord;
+        private readonly ProductionTrackingService _trackingService;
+        private Guid? _currentMainId = null;
+        private readonly DuckDbService _dbService;
 
-        public SequenceTaskExecutor(PlcConnection stagePlc, int deviceIndex, string slot, Positions coord, DeviceMonitor deviceMonitor)
+
+        public SequenceTaskExecutor(PlcConnection stagePlc, int deviceIndex, string slot, Positions coord, DeviceMonitor deviceMonitor, DuckDbService dbService)
         {
             _stagePlc = stagePlc;
             _deviceIndex = deviceIndex;
             _deviceMonitor = deviceMonitor;
             _slot = slot;
             _coord = coord;
+            _dbService = dbService;
         }
 
         public async Task PutRunAsync(CancellationToken cancellationToken = default)
@@ -386,6 +395,25 @@ namespace JLSoft.Wind.Services
                     LogManager.Log($"JOB ID: {jobData.JOB_ID}");
                     LogManager.Log($"类型: {GetTypeDescription(jobData.Type)}");
                     LogManager.Log($"V制程完成: {jobData.ProcessFlag.V_Processed}");
+
+
+                    // 2. 检查是否存在主流程数据
+                    if (!_currentMainId.HasValue)
+                    {
+                        // 获取该产品的预设工艺流程
+                        var processFlow = GetProcessFlow(jobData.JOB_ID);
+
+                        // 创建主流程和步骤数据
+                        _currentMainId = _trackingService.StartProduction(
+                            jobData.JOB_ID,
+                            jobData.JOBID_Pair,
+                            processFlow
+                        );
+                    }
+
+                    // 3. 记录步骤开始
+                    string stepName = $"{deviceCode}_Pick";
+                    _trackingService.StartProcessStep(_currentMainId.Value, stepName);
                 }
                 else
                 {
@@ -455,7 +483,11 @@ namespace JLSoft.Wind.Services
             var robotManager = RobotManager.Instance;
             if (robotManager != null && robotManager.IsConnected)
             {
-                await RobotManager.Instance.RobotClient.AxisAndRobotGetAsync(deviceCode, _slot, Convert.ToInt32(_coord.X), Convert.ToInt32(_coord.Y), Convert.ToInt32(_coord.Z));
+                CancellationToken cts = new CancellationToken();
+                System.Enum.TryParse<Station>(deviceCode, out Station station);
+                await robotManager.AxisMovStation(deviceCode,_coord);
+                await Task.Delay(500);
+                await robotManager.Robot_GetAsync(station, deviceCode, cts);
             }
             else
             {
@@ -472,12 +504,56 @@ namespace JLSoft.Wind.Services
             var robotManager = RobotManager.Instance;
             if (robotManager != null && robotManager.IsConnected)
             {
-                await RobotManager.Instance.RobotClient.AxisAndRobotGetAsync(deviceCode, _slot, Convert.ToInt32(_coord.X), Convert.ToInt32(_coord.Y), Convert.ToInt32(_coord.Z));
+                CancellationToken cts = new CancellationToken();
+                System.Enum.TryParse<Station>(deviceCode, out Station station);
+                await robotManager.AxisMovStation(deviceCode, _coord);
+                await Task.Delay(500);
+                await robotManager.Robot_PutAsync(station, deviceCode, cts);
+
+                if (_currentMainId.HasValue)
+                {
+                    // 获取当前步骤名称（如设备A1的"Load"操作）
+                    string stepName = $"{deviceCode}_Place";
+                    string nextStepName = GetNextStepName(deviceCode);
+                    // 记录步骤完成时间（触发QTime计算起点）
+                    _trackingService.CompleteProcessStep(_currentMainId.Value, stepName);
+
+                    // 记录移动到下一步（触发QTime计算）
+                    _trackingService.MoveToNextStep(_currentMainId.Value, nextStepName);
+                }
             }
             else
             {
                 LogManager.Log("ROBOT: 机器人未连接，无法执行准备动作", LogLevel.Warn, "Robot.Main");
             }
+
+        }
+        private string GetNextStepName(string deviceCode)
+        {
+            // 实际逻辑应根据流程配置确定
+            return deviceCode switch
+            {
+                "A1" => "A2_Process",
+                "A2" => "C1_Clean",
+                "C1" => "Final_Inspection",
+                _ => "Complete"
+            };
+        }
+        private List<ProcessFlowItem> GetProcessFlow(string productType)
+        {
+            // 从数据库查询（文档11 ProcessFlowFrm）
+            string sql = @"SELECT WorkstageName, Seq, Qtime 
+                   FROM process_flow_item 
+                   WHERE WorkstageName = ?";
+
+            var dt = _dbService.ExecuteQuery(sql, new DuckDBParameter(productType));
+
+            return dt.AsEnumerable().Select(row => new ProcessFlowItem
+            {
+                WorkstageName = row["WorkstageName"].ToString(),
+                Seq = Convert.ToInt32(row["Seq"]),
+                Qtime = Convert.ToInt32(row["Qtime"])
+            }).ToList();
         }
         /// 
         /// </summary>

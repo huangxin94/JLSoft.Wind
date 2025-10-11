@@ -12,6 +12,9 @@ namespace JLSoft.Wind.Database.Models
         [JsonProperty("DeviceCode")]
         public string DeviceCode { get; set; }
 
+        [JsonProperty("bieName")]
+        public string bieName { get; set; }
+
         [JsonProperty("Index")]
         public int Index { get; set; }
 
@@ -42,6 +45,10 @@ namespace JLSoft.Wind.Database.Models
     {
         [JsonProperty("Name")]
         public string Name { get; set; }
+
+
+        [JsonProperty("bieName")]
+        public string bieName { get; set; }
 
 
         [JsonProperty("Positions")]

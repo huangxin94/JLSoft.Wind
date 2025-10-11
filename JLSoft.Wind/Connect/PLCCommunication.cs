@@ -44,7 +44,7 @@ namespace JLSoft.Wind.Connect
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"连接错误: {ex.Message}");
+                Console.WriteLine($"PLC连接错误: {ex.Message}");
                 return false;
             }
         }

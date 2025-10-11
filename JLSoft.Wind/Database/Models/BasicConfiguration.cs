@@ -18,6 +18,21 @@ namespace JLSoft.Wind.Database.Models
 
         [JsonProperty("Slplc")]
         public PLCConfig Plc { get; set; }
+        [JsonProperty("AngleTConfig")]
+        public AngleTConfig AngleTConfig { get; set; }
+        [JsonProperty("AlignerConfig")]
+        public AlignerConfig AlignerConfig { get; set; }
+        [JsonProperty("LoadPort1Config")]
+        public string LoadPort1Config { get; set; }
+        [JsonProperty("LoadPort2Config")]
+        public string LoadPort2Config { get; set; }
+        [JsonProperty("AlignerOCRConfig")]
+        public PLCConfig AlignerOCRConfig { get; set; }
+        [JsonProperty("AngleTOCRConfig")]
+        public PLCConfig AngleTOCRConfig { get; set; }
+        [JsonProperty("TeachServerConfig")]
+        public PLCConfig TeachServerConfig { get; set; }
+
 
         [JsonProperty("DeviceIndices")]
         public List<DeviceIndices> Site { get; set; } = new();

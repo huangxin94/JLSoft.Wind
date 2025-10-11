@@ -111,6 +111,7 @@ namespace JLSoft.Wind.Settings
         /// <param name="e"></param>
         private void but_addrocess_Click(object sender, EventArgs e)
         {
+
             try
             {
                 if (tbx_addmaterialname.Text.Trim() == "" || tbx_addprocessname.Text.Trim() == "")

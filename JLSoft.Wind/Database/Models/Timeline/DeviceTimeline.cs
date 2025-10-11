@@ -16,7 +16,7 @@ namespace JLSoft.Wind.Database.Models.Timeline
         /// <summary>
         /// 设备状态
         /// </summary>
-        public DeviceStatus Status { get; set; }
+        public DeviceStatusPLC Status { get; set; }
         /// <summary>
         /// 最后更新时间
         /// </summary>

@@ -21,7 +21,10 @@ namespace JLSoft.Wind.Services
         public TimechartService(CommunicationCoordinator coordinator)
         {
             _coordinator = coordinator;
-            _coordinator.TimechartUpdated += HandleTimelineUpdate;
+            if(_coordinator != null)
+            {
+                _coordinator.TimechartUpdated += HandleTimelineUpdate;
+            }
         }
         /// <summary>
         /// 处理时间线更新事件，更新设备数据系列。统一时间线数据转换为数据点
@@ -29,6 +32,9 @@ namespace JLSoft.Wind.Services
         /// <param name="deviceTimelines"></param>
         private void HandleTimelineUpdate(Dictionary<int, DeviceTimeline> deviceTimelines) // 修改参数名为deviceTimelines（复数）
         {
+            if (_coordinator == null) { 
+                return;
+            }
             foreach (var deviceEntry in deviceTimelines)
             {
                 int deviceId = deviceEntry.Key;
@@ -79,6 +85,7 @@ namespace JLSoft.Wind.Services
 
             return _deviceSeries[deviceId].GetSeries(seriesName);
         }
+        public bool IsInitialized => _coordinator != null;
     }
     /// <summary>
     /// 设备数据系列类，管理特定设备的所有数据系列。结构化存储时序数据（状态/CPU/内存等）

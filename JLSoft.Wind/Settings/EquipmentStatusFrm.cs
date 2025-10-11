@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using JLSoft.Wind.Logs;
 using JLSoft.Wind.Services;
 using JLSoft.Wind.Services.Status;
 
@@ -20,9 +21,9 @@ namespace JLSoft.Wind.Settings
 
         public EquipmentStatusFrm(DeviceMonitor deviceMonitor)
         {
+            
             InitializeComponent();
             _deviceMonitor = deviceMonitor;
-            InitializeStatusMapping();
         }
 
         // 初始化状态灯映射
@@ -202,16 +203,29 @@ namespace JLSoft.Wind.Settings
         {
             base.OnLoad(e);
             // 订阅设备状态更新事件
-            Console.WriteLine("窗体加载事件触发"); // 调试输出
-            _deviceMonitor.DeviceStatesUpdated += OnDeviceStatesUpdated;
+
+
+            InitializeStatusMapping();
+            if (_deviceMonitor != null)
+            {
+                _deviceMonitor.DeviceStatesUpdated += OnDeviceStatesUpdated;
+            }
+            else
+            {
+                LogManager.Log("设备监控器未初始化",Sunny.UI.LogLevel.Error);
+            }
+
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
             base.OnFormClosed(e);
             // 取消事件订阅
-            Console.WriteLine("窗体关闭事件触发"); // 调试输出
-            _deviceMonitor.DeviceStatesUpdated -= OnDeviceStatesUpdated;
+            if(_deviceMonitor != null)
+            {
+                _deviceMonitor.DeviceStatesUpdated -= OnDeviceStatesUpdated;
+
+            }
         }
 
         private void OnDeviceStatesUpdated(Dictionary<string, DeviceMonitor.DeviceState> deviceStates)

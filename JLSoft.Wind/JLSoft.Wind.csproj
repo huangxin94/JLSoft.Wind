@@ -15,6 +15,8 @@
  	<EnableWindowsFormsHighDpiAutoResizing>true</EnableWindowsFormsHighDpiAutoResizing>
 
  	<ApplicationManifest>app.manifest</ApplicationManifest>
+
+ 	<PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,16 +28,17 @@
     <PackageReference Include="HslCommunication" Version="12.3.0" />
     <PackageReference Include="MaterialSkin.2" Version="2.3.1" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.5.0" />
     <PackageReference Include="OpenTK" Version="4.8.2" />
     <PackageReference Include="OpenTK.GLControl" Version="4.0.1" />
     <PackageReference Include="SqlSugarCore" Version="5.1.4.130" />
     <PackageReference Include="SunnyUI" Version="3.8.3" />
+	<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -60,7 +63,34 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="BasicConfiguration.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Image\robot.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="lib\AlignerControllerSDK.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="lib\DMC-E3000.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="lib\HWAlignerAPI.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="lib\HWLPAPI.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="lib\IV4OCRAPI.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="lib\KeyenceOCR_IV4.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="lib\LTDMC.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="lib\RobotSocketAPI.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="NLog.config">
@@ -69,6 +99,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Context\" />
     <Folder Include="Database\Queries\" />
     <Folder Include="Resources\" />
   </ItemGroup>
@@ -77,8 +108,20 @@
     <Reference Include="AlignerControllerSDK">
       <HintPath>AlignerControllerSDK.dll</HintPath>
     </Reference>
+    <Reference Include="AngleTAPI">
+      <HintPath>lib\AngleTAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="DMC-E3000">
+      <HintPath>lib\DMC-E3000.dll</HintPath>
+    </Reference>
+    <Reference Include="HWAlignerAPI">
+      <HintPath>lib\HWAlignerAPI.dll</HintPath>
+    </Reference>
     <Reference Include="HWLPAPI">
       <HintPath>HWLPAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="IV4OCRAPI">
+      <HintPath>lib\IV4OCRAPI.dll</HintPath>
     </Reference>
     <Reference Include="KeyenceOCR_IV4">
       <HintPath>KeyenceOCR_IV4.dll</HintPath>

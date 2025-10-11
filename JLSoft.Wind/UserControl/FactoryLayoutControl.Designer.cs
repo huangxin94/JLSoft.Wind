@@ -29,8 +29,6 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FactoryLayoutControl));
-            deviceBlock22 = new JLSoft.Wind.CustomControl.DeviceBlock2();
-            deviceBlock21 = new JLSoft.Wind.CustomControl.DeviceBlock2();
             deviceBlock12 = new DeviceBlock();
             deviceBlock11 = new DeviceBlock();
             deviceBlock10 = new DeviceBlock();
@@ -38,7 +36,6 @@
             deviceBlock8 = new DeviceBlock();
             pseudoCubeControl6 = new PseudoCubeControl();
             pseudoCubeControl5 = new PseudoCubeControl();
-            pseudoCubeControl4 = new PseudoCubeControl();
             deviceBlock7 = new DeviceBlock();
             deviceBlock6 = new DeviceBlock();
             pseudoCubeControl3 = new PseudoCubeControl();
@@ -47,42 +44,18 @@
             deviceBlock3 = new DeviceBlock();
             deviceBlock2 = new DeviceBlock();
             deviceBlock1 = new DeviceBlock();
-            pseudoCubeControl2 = new PseudoCubeControl();
-            pseudoCubeControl1 = new PseudoCubeControl();
             uiPanel2 = new Sunny.UI.UIPanel();
             pictureBox1 = new PictureBox();
             label7 = new Label();
-            pseudoCubeControl7 = new PseudoCubeControl();
+            deviceBlock13 = new DeviceBlock();
+            deviceBlock14 = new DeviceBlock();
+            deviceBlock15 = new DeviceBlock();
+            deviceBlock16 = new DeviceBlock();
+            deviceBlock17 = new DeviceBlock();
+            deviceBlock18 = new DeviceBlock();
             uiPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
-            // 
-            // deviceBlock22
-            // 
-            deviceBlock22.BlockColor = Color.Silver;
-            deviceBlock22.DeviceCode = "LD2";
-            deviceBlock22.DeviceCodeFont = new Font("Arial", 7F, FontStyle.Bold);
-            deviceBlock22.Location = new Point(902, 171);
-            deviceBlock22.Name = "deviceBlock22";
-            deviceBlock22.Size = new Size(29, 22);
-            deviceBlock22.StatusValue = "";
-            deviceBlock22.StatusValueFont = new Font("Arial", 16F, FontStyle.Bold);
-            deviceBlock22.TabIndex = 68;
-            deviceBlock22.Text = "LD2";
-            // 
-            // deviceBlock21
-            // 
-            deviceBlock21.BlockColor = Color.Silver;
-            deviceBlock21.DeviceCode = "LD1";
-            deviceBlock21.DeviceCodeFont = new Font("Arial", 7F, FontStyle.Bold);
-            deviceBlock21.Location = new Point(867, 171);
-            deviceBlock21.Name = "deviceBlock21";
-            deviceBlock21.Size = new Size(29, 22);
-            deviceBlock21.StatusValue = "";
-            deviceBlock21.StatusValueFont = new Font("Arial", 16F, FontStyle.Bold);
-            deviceBlock21.TabIndex = 67;
-            deviceBlock21.Tag = "";
-            deviceBlock21.Text = "LD1";
             // 
             // deviceBlock12
             // 
@@ -167,19 +140,6 @@
             pseudoCubeControl5.Size = new Size(68, 21);
             pseudoCubeControl5.TabIndex = 60;
             pseudoCubeControl5.Text = "pseudoCubeControl5";
-            // 
-            // pseudoCubeControl4
-            // 
-            pseudoCubeControl4.CubeColor = Color.FromArgb(255, 192, 128);
-            pseudoCubeControl4.LabelColor = Color.Black;
-            pseudoCubeControl4.LabelFont = new Font("仿宋", 9F, FontStyle.Bold);
-            pseudoCubeControl4.LabelText = "寻边器";
-            pseudoCubeControl4.Location = new Point(582, 171);
-            pseudoCubeControl4.Name = "pseudoCubeControl4";
-            pseudoCubeControl4.Size = new Size(55, 21);
-            pseudoCubeControl4.TabIndex = 59;
-            pseudoCubeControl4.Tag = "";
-            pseudoCubeControl4.Text = "pseudoCubeControl4";
             // 
             // deviceBlock7
             // 
@@ -277,30 +237,6 @@
             deviceBlock1.StatusColor = Color.Green;
             deviceBlock1.TabIndex = 51;
             // 
-            // pseudoCubeControl2
-            // 
-            pseudoCubeControl2.CubeColor = Color.Green;
-            pseudoCubeControl2.LabelColor = Color.Black;
-            pseudoCubeControl2.LabelFont = new Font("宋体", 12F, FontStyle.Bold);
-            pseudoCubeControl2.LabelText = "X1";
-            pseudoCubeControl2.Location = new Point(931, 91);
-            pseudoCubeControl2.Name = "pseudoCubeControl2";
-            pseudoCubeControl2.Size = new Size(34, 77);
-            pseudoCubeControl2.TabIndex = 50;
-            pseudoCubeControl2.Text = "pseudoCubeControl2";
-            // 
-            // pseudoCubeControl1
-            // 
-            pseudoCubeControl1.CubeColor = Color.Green;
-            pseudoCubeControl1.LabelColor = Color.Black;
-            pseudoCubeControl1.LabelFont = new Font("仿宋", 12F, FontStyle.Bold);
-            pseudoCubeControl1.LabelText = "P1";
-            pseudoCubeControl1.Location = new Point(34, 91);
-            pseudoCubeControl1.Name = "pseudoCubeControl1";
-            pseudoCubeControl1.Size = new Size(34, 77);
-            pseudoCubeControl1.TabIndex = 49;
-            pseudoCubeControl1.Text = "pseudoCubeControl1";
-            // 
             // uiPanel2
             // 
             uiPanel2.BackColor = Color.FromArgb(128, 255, 255);
@@ -340,26 +276,88 @@
             label7.TabIndex = 75;
             label7.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // pseudoCubeControl7
+            // deviceBlock13
             // 
-            pseudoCubeControl7.CubeColor = Color.Green;
-            pseudoCubeControl7.LabelColor = Color.Black;
-            pseudoCubeControl7.LabelFont = new Font("仿宋", 9F, FontStyle.Bold);
-            pseudoCubeControl7.LabelText = "角度台";
-            pseudoCubeControl7.Location = new Point(582, 203);
-            pseudoCubeControl7.Name = "pseudoCubeControl7";
-            pseudoCubeControl7.Size = new Size(55, 21);
-            pseudoCubeControl7.TabIndex = 76;
-            pseudoCubeControl7.Tag = "";
-            pseudoCubeControl7.Text = "pseudoCubeControl7";
+            deviceBlock13.DeviceCode = "寻边机";
+            deviceBlock13.DeviceStatus = DeviceStatus.Idle;
+            deviceBlock13.Font = new Font("仿宋", 12F, FontStyle.Bold);
+            deviceBlock13.IsDraggable = false;
+            deviceBlock13.Location = new Point(546, 171);
+            deviceBlock13.Name = "deviceBlock13";
+            deviceBlock13.Size = new Size(78, 28);
+            deviceBlock13.StatusColor = Color.Green;
+            deviceBlock13.TabIndex = 76;
+            // 
+            // deviceBlock14
+            // 
+            deviceBlock14.DeviceCode = "角度台";
+            deviceBlock14.DeviceStatus = DeviceStatus.Idle;
+            deviceBlock14.Font = new Font("仿宋", 12F, FontStyle.Bold);
+            deviceBlock14.IsDraggable = false;
+            deviceBlock14.Location = new Point(546, 202);
+            deviceBlock14.Name = "deviceBlock14";
+            deviceBlock14.Size = new Size(78, 28);
+            deviceBlock14.StatusColor = Color.Green;
+            deviceBlock14.TabIndex = 77;
+            // 
+            // deviceBlock15
+            // 
+            deviceBlock15.DeviceCode = "LP1";
+            deviceBlock15.DeviceStatus = DeviceStatus.Idle;
+            deviceBlock15.Font = new Font("仿宋", 12F, FontStyle.Bold);
+            deviceBlock15.IsDraggable = false;
+            deviceBlock15.Location = new Point(828, 171);
+            deviceBlock15.Name = "deviceBlock15";
+            deviceBlock15.Size = new Size(54, 28);
+            deviceBlock15.StatusColor = Color.Green;
+            deviceBlock15.TabIndex = 78;
+            // 
+            // deviceBlock16
+            // 
+            deviceBlock16.DeviceCode = "LP2";
+            deviceBlock16.DeviceStatus = DeviceStatus.Idle;
+            deviceBlock16.Font = new Font("仿宋", 12F, FontStyle.Bold);
+            deviceBlock16.IsDraggable = false;
+            deviceBlock16.Location = new Point(883, 171);
+            deviceBlock16.Name = "deviceBlock16";
+            deviceBlock16.Size = new Size(54, 28);
+            deviceBlock16.StatusColor = Color.Green;
+            deviceBlock16.TabIndex = 79;
+            // 
+            // deviceBlock17
+            // 
+            deviceBlock17.DeviceCode = "P1";
+            deviceBlock17.DeviceStatus = DeviceStatus.Idle;
+            deviceBlock17.Font = new Font("仿宋", 12F, FontStyle.Bold);
+            deviceBlock17.IsDraggable = false;
+            deviceBlock17.Location = new Point(17, 91);
+            deviceBlock17.Name = "deviceBlock17";
+            deviceBlock17.Size = new Size(47, 77);
+            deviceBlock17.StatusColor = Color.Green;
+            deviceBlock17.TabIndex = 80;
+            // 
+            // deviceBlock18
+            // 
+            deviceBlock18.DeviceCode = "X1";
+            deviceBlock18.DeviceStatus = DeviceStatus.Idle;
+            deviceBlock18.Font = new Font("仿宋", 12F, FontStyle.Bold);
+            deviceBlock18.IsDraggable = false;
+            deviceBlock18.Location = new Point(935, 91);
+            deviceBlock18.Name = "deviceBlock18";
+            deviceBlock18.Size = new Size(47, 77);
+            deviceBlock18.StatusColor = Color.Green;
+            deviceBlock18.TabIndex = 81;
             // 
             // FactoryLayoutControl
             // 
             AutoScaleMode = AutoScaleMode.None;
-            Controls.Add(pseudoCubeControl7);
+            Controls.Add(deviceBlock18);
+            Controls.Add(deviceBlock17);
+            Controls.Add(deviceBlock16);
+            Controls.Add(deviceBlock15);
+            Controls.Add(deviceBlock14);
+            Controls.Add(deviceBlock13);
             Controls.Add(label7);
-            Controls.Add(deviceBlock22);
-            Controls.Add(deviceBlock21);
             Controls.Add(deviceBlock12);
             Controls.Add(deviceBlock11);
             Controls.Add(deviceBlock10);
@@ -367,7 +365,6 @@
             Controls.Add(deviceBlock8);
             Controls.Add(pseudoCubeControl6);
             Controls.Add(pseudoCubeControl5);
-            Controls.Add(pseudoCubeControl4);
             Controls.Add(deviceBlock7);
             Controls.Add(deviceBlock6);
             Controls.Add(pseudoCubeControl3);
@@ -376,8 +373,6 @@
             Controls.Add(deviceBlock3);
             Controls.Add(deviceBlock2);
             Controls.Add(deviceBlock1);
-            Controls.Add(pseudoCubeControl2);
-            Controls.Add(pseudoCubeControl1);
             Controls.Add(uiPanel2);
             Name = "FactoryLayoutControl";
             Size = new Size(988, 256);
@@ -388,8 +383,6 @@
         }
 
         #endregion
-        private CustomControl.DeviceBlock2 deviceBlock22;
-        private CustomControl.DeviceBlock2 deviceBlock21;
         private DeviceBlock deviceBlock12;
         private DeviceBlock deviceBlock11;
         private DeviceBlock deviceBlock10;
@@ -397,7 +390,6 @@
         private DeviceBlock deviceBlock8;
         private PseudoCubeControl pseudoCubeControl6;
         private PseudoCubeControl pseudoCubeControl5;
-        private PseudoCubeControl pseudoCubeControl4;
         private DeviceBlock deviceBlock7;
         private DeviceBlock deviceBlock6;
         private PseudoCubeControl pseudoCubeControl3;
@@ -406,11 +398,14 @@
         private DeviceBlock deviceBlock3;
         private DeviceBlock deviceBlock2;
         private DeviceBlock deviceBlock1;
-        private PseudoCubeControl pseudoCubeControl2;
-        private PseudoCubeControl pseudoCubeControl1;
         private Sunny.UI.UIPanel uiPanel2;
         private PictureBox pictureBox1;
         private Label label7;
-        private PseudoCubeControl pseudoCubeControl7;
+        private DeviceBlock deviceBlock13;
+        private DeviceBlock deviceBlock14;
+        private DeviceBlock deviceBlock15;
+        private DeviceBlock deviceBlock16;
+        private DeviceBlock deviceBlock17;
+        private DeviceBlock deviceBlock18;
     }
 }
